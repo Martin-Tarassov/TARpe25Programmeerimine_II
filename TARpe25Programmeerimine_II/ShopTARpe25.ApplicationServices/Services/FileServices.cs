@@ -39,7 +39,15 @@ namespace ShopTARpe25.ApplicationServices.Services
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         file.CopyTo(fileStream);
-                    }
+
+                        FileToApi path = new FileToApi
+                        {
+                            Id = Guid.NewGuid(),
+                            ExistingFilePath = uniqueFileName,
+                            SpaceshipId = domain.Id
+                        };
+                        _context.FileToApis.AddAsync(path);
+                    }                
                 }
             }
         }
