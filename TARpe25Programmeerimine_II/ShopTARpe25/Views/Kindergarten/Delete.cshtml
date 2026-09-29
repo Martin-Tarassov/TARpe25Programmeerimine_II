@@ -1,0 +1,38 @@
+﻿@model ShopTARpe25.Models.Kindergarten.KindergartenDeleteViewModel
+
+<h1>Delete</h1>
+
+<div>
+    <h4>Kindergarten</h4>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Id)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.Id)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.GroupName)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.GroupName)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ChildrenCount)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.ChildrenCount)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.KindergartenName)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.KindergartenName)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.TeacherName)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.TeacherName)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.CreatedAt)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.CreatedAt)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.UpdatedAt)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(m => m.UpdatedAt)</dd>
+    </dl>
+
+    <hr />
+    <form asp-action="DeleteConfirmation" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" />
+        <a asp-action="Index" asp-controller="Kindergarten" class="btn btn-success">Back</a>
+    </form>
+</div>

@@ -1,0 +1,40 @@
+﻿@model ShopTARpe25.Models.Kindergarten.KindergartenCreateViewModel
+
+<h1>Kindergarten Create</h1>
+
+<form method="post">
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="CreatedAt" type="hidden" />
+    <input asp-for="UpdatedAt" type="hidden" />
+
+    <div class="form-group row">
+        <label asp-for="GroupName" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="GroupName" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="ChildrenCount" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="ChildrenCount" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="KindergartenName" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="KindergartenName" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label asp-for="TeacherName" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="TeacherName" class="form-control" />
+        </div>
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Create" />
+    <a asp-action="Index" asp-controller="Kindergarten" class="btn btn-secondary">Back to List</a>
+</form>
