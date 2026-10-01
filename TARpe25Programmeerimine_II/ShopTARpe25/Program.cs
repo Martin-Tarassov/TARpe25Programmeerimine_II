@@ -11,6 +11,8 @@ namespace ShopTARpe25
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddScoped<IFileServices, FileServices>();
+
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();

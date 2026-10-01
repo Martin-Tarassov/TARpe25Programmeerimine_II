@@ -40,7 +40,8 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var vm = new SpaceshipCreateViewModel();
+            return View(vm);
         }
 
         [HttpPost]
@@ -52,7 +53,15 @@ namespace ShopTARpe25.Controllers
                 Classification = vm.Classification,
                 BuiltDate = vm.BuiltDate,
                 Crew = vm.Crew,
-                EnginePower = vm.EnginePower
+                EnginePower = vm.EnginePower,
+                Files = vm.Files,
+                FileToApiDtos = vm.Image.Select(file => new FileToApiDto
+                {
+                    Id = file.ImageId,
+                    ExistingFilePath = file.FilePath,
+                    SpaceshipId = file.SpaceshipId
+                }).ToArray()
+
             };
 
             var result = await _spaceshipService.Create(dto);
