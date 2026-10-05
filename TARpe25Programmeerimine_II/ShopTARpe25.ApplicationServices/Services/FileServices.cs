@@ -43,7 +43,7 @@ namespace ShopTARpe25.ApplicationServices.Services
                         FileToApi path = new FileToApi
                         {
                             Id = Guid.NewGuid(),
-                            ExistingFilePath = uniqueFileName,
+                            ExistingFilePath =  uniqueFileName,
                             SpaceshipId = domain.Id
                         };
                         _context.FileToApis.AddAsync(path);

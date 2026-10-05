@@ -3,6 +3,7 @@ using ShopTARpe25.Models.Spaceship;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace ShopTARpe25.Controllers
 {
@@ -47,6 +48,8 @@ namespace ShopTARpe25.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(SpaceshipCreateViewModel vm)
         {
+            if (!ModelState.IsValid) return View(vm);
+
             var dto = new SpaceshipDto
             {
                 Name = vm.Name,
@@ -79,7 +82,16 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            var vm = new SpaceshipDetailsViewModel();
+            var images = await _context.FileToApis
+                .Where(x => x.SpaceshipId == id)
+                .Select(y => new ImageViewModel
+                {
+                    ImageId = y.Id,
+                    FilePath = y.ExistingFilePath,
+                    SpaceshipId = y.SpaceshipId
+                }).ToListAsync();
+
+            var vm = new SpaceshipDetailsViewModel(); 
 
             vm.Id = spaceship.Id;
             vm.Name = spaceship.Name;
@@ -89,6 +101,7 @@ namespace ShopTARpe25.Controllers
             vm.EnginePower = spaceship.EnginePower;
             vm.CreatedAt = spaceship.CreatedAt;
             vm.ModifiedAt = spaceship.ModifiedAt;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
@@ -157,6 +170,7 @@ namespace ShopTARpe25.Controllers
             vm.EnginePower = spaceship.EnginePower;
             vm.CreatedAt = spaceship.CreatedAt;
             vm.ModifiedAt = spaceship.ModifiedAt;
+            
 
             return View(vm);
         }
