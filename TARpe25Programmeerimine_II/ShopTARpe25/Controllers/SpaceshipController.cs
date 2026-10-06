@@ -58,7 +58,8 @@ namespace ShopTARpe25.Controllers
                 Crew = vm.Crew,
                 EnginePower = vm.EnginePower,
                 Files = vm.Files,
-                FileToApiDtos = vm.Image.Select(file => new FileToApiDto
+                FileToApiDtos = vm.Image
+                    .Select(file => new FileToApiDto
                 {
                     Id = file.ImageId,
                     ExistingFilePath = file.FilePath,
@@ -86,8 +87,8 @@ namespace ShopTARpe25.Controllers
                 .Where(x => x.SpaceshipId == id)
                 .Select(y => new ImageViewModel
                 {
-                    ImageId = y.Id,
                     FilePath = y.ExistingFilePath,
+                    ImageId = y.Id,                
                     SpaceshipId = y.SpaceshipId
                 }).ToListAsync();
 
@@ -170,7 +171,17 @@ namespace ShopTARpe25.Controllers
             vm.EnginePower = spaceship.EnginePower;
             vm.CreatedAt = spaceship.CreatedAt;
             vm.ModifiedAt = spaceship.ModifiedAt;
-            
+
+            var images = await _context.FileToApis
+                 .Where(x => x.SpaceshipId == id)
+                 .Select(y => new ImageViewModel
+                 {
+                     ImageId = y.Id,
+                     FilePath = y.ExistingFilePath,
+                     SpaceshipId = y.SpaceshipId
+                 }).ToListAsync();
+
+            vm.Images.AddRange(images);
 
             return View(vm);
         }

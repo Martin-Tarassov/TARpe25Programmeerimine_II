@@ -64,6 +64,7 @@
     @foreach (var image in Model.Images)
     {
         <partial name="_Images" model="image" />
+        <br/>
     }
     
     <a asp-action="Index" asp-controller="spaceship" class="btn btn-danger">Back to List</a>
