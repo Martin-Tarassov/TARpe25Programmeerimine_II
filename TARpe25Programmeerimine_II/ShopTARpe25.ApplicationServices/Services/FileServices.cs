@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
@@ -43,13 +44,33 @@ namespace ShopTARpe25.ApplicationServices.Services
                         FileToApi path = new FileToApi
                         {
                             Id = Guid.NewGuid(),
-                            ExistingFilePath = "/multipleFileUpload/" + uniqueFileName,
+                            ExistingFilePath = uniqueFileName,
                             SpaceshipId = domain.Id
                         };
                         _context.FileToApis.AddAsync(path);
                     }                
                 }
             }
+        }
+        public async Task<FileToApi> RemoveImageFromApi(FileToApiDto dto)
+        {
+            var imageId = await _context.FileToApis
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
+
+            var filePath = _webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\" 
+                + imageId.ExistingFilePath;
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+
+            _context.FileToApis.Remove(imageId);
+            await _context.SaveChangesAsync();
+
+            return imageId;
+
+
         }
     }
 }

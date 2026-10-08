@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShopTARpe25.Models.Spaceship;
+using Microsoft.EntityFrameworkCore;
+using ShopTARpe25.ApplicationServices.Services;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
-using Microsoft.EntityFrameworkCore;
+using ShopTARpe25.Models.Spaceship;
 
 namespace ShopTARpe25.Controllers
 {
@@ -11,15 +12,18 @@ namespace ShopTARpe25.Controllers
     {
         private readonly ISpaceshipServices _spaceshipService;
         private readonly ShopTARpe25Context _context;
+        private readonly IFileServices _fileServices;
 
         public SpaceshipController
             (
                 ISpaceshipServices spaceshipService,
-                ShopTARpe25Context context
+                ShopTARpe25Context context,
+                IFileServices fileServices
             )
         {
             _spaceshipService = spaceshipService;
             _context = context;
+            _fileServices = fileServices;
         }
 
         public IActionResult Index()
@@ -60,11 +64,11 @@ namespace ShopTARpe25.Controllers
                 Files = vm.Files,
                 FileToApiDtos = vm.Image
                     .Select(file => new FileToApiDto
-                {
-                    Id = file.ImageId,
-                    ExistingFilePath = file.FilePath,
-                    SpaceshipId = file.SpaceshipId
-                }).ToArray()
+                    {
+                        Id = file.ImageId,
+                        ExistingFilePath = file.FilePath,
+                        SpaceshipId = file.SpaceshipId
+                    }).ToArray()
 
             };
 
@@ -88,11 +92,11 @@ namespace ShopTARpe25.Controllers
                 .Select(y => new ImageViewModel
                 {
                     FilePath = y.ExistingFilePath,
-                    ImageId = y.Id,                
+                    ImageId = y.Id,
                     SpaceshipId = y.SpaceshipId
                 }).ToListAsync();
 
-            var vm = new SpaceshipDetailsViewModel(); 
+            var vm = new SpaceshipDetailsViewModel();
 
             vm.Id = spaceship.Id;
             vm.Name = spaceship.Name;
@@ -117,6 +121,14 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
+            var images = await _context.FileToApis
+               .Where(x => x.SpaceshipId == id)
+               .Select(y => new ImageViewModel
+               {
+                   FilePath = y.ExistingFilePath,
+                   ImageId = y.Id,
+                   SpaceshipId = y.SpaceshipId
+               }).ToListAsync();
             var vm = new SpaceshipUpdateViewModel();
 
             vm.Id = spaceship.Id;
@@ -127,6 +139,7 @@ namespace ShopTARpe25.Controllers
             vm.EnginePower = spaceship.EnginePower;
             vm.CreatedAt = spaceship.CreatedAt;
             vm.ModifiedAt = spaceship.ModifiedAt;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
@@ -189,9 +202,28 @@ namespace ShopTARpe25.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteConfirmation(Guid id)
         {
-            var result = await _spaceshipService.Delete(id);
+            var spaceship = await _spaceshipService.Delete(id);
+
+            if (spaceship == null)
+            {
+                return NotFound();
+            }
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveImage(ImageViewModel vm)
+        {
+            var dto = new FileToApiDto
+            {
+                Id = vm.ImageId
+            };
+
+            var image = await _fileServices.RemoveImageFromApi(dto);
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
