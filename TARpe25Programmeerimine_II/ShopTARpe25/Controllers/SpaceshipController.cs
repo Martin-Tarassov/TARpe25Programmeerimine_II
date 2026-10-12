@@ -45,12 +45,12 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var vm = new SpaceshipCreateViewModel();
+            var vm = new SpaceshipCreateUpdateViewModel();
             return View(vm);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(SpaceshipCreateViewModel vm)
+        public async Task<IActionResult> Create(SpaceshipCreateUpdateViewModel vm)
         {
             if (!ModelState.IsValid) return View(vm);
 
@@ -147,17 +147,26 @@ namespace ShopTARpe25.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(SpaceshipUpdateViewModel vm)
         {
-            var dto = new SpaceshipDto()
+            var dto = new SpaceshipDto
             {
                 Id = vm.Id,
                 Name = vm.Name,
                 Classification = vm.Classification,
+                BuiltDate = vm.BuiltDate,
                 Crew = vm.Crew,
                 EnginePower = vm.EnginePower,
-                BuiltDate = vm.BuiltDate,
                 CreatedAt = vm.CreatedAt,
-                ModifiedAt = vm.ModifiedAt
+                ModifiedAt = vm.ModifiedAt,
+                Files = vm.Files,
+                FileToApiDtos = vm.Images
+                    .Select(file => new FileToApiDto
+                    {
+                         Id = file.ImageId,
+                         ExistingFilePath = file.FilePath,
+                         SpaceshipId = file.SpaceshipId
+                    }).ToArray()
             };
+
 
             var result = await _spaceshipService.Update(dto);
 
