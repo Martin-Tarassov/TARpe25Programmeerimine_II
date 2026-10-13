@@ -46,7 +46,7 @@ namespace ShopTARpe25.Controllers
         public IActionResult Create()
         {
             var vm = new SpaceshipCreateUpdateViewModel();
-            return View(vm);
+            return View("CreateUpdate", vm);
         }
 
         [HttpPost]
@@ -74,7 +74,13 @@ namespace ShopTARpe25.Controllers
 
             var result = await _spaceshipService.Create(dto);
 
+            if (result == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
+
         }
 
         [HttpGet]
@@ -129,7 +135,7 @@ namespace ShopTARpe25.Controllers
                    ImageId = y.Id,
                    SpaceshipId = y.SpaceshipId
                }).ToListAsync();
-            var vm = new SpaceshipUpdateViewModel();
+            var vm = new SpaceshipCreateUpdateViewModel();
 
             vm.Id = spaceship.Id;
             vm.Name = spaceship.Name;
@@ -139,9 +145,9 @@ namespace ShopTARpe25.Controllers
             vm.EnginePower = spaceship.EnginePower;
             vm.CreatedAt = spaceship.CreatedAt;
             vm.ModifiedAt = spaceship.ModifiedAt;
-            vm.Images.AddRange(images);
+            vm.Image.AddRange(images);
 
-            return View(vm);
+            return View("CreateUpdate" , vm);
         }
 
         [HttpPost]
@@ -166,9 +172,12 @@ namespace ShopTARpe25.Controllers
                          SpaceshipId = file.SpaceshipId
                     }).ToArray()
             };
-
-
             var result = await _spaceshipService.Update(dto);
+
+            if (result == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
 
             return RedirectToAction(nameof(Index));
         }

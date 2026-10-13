@@ -49,7 +49,6 @@ else
         </div>
     </div>
 
-    See koht on Failide üleslaadimise vorm.
     <div class="form-group row">
         <label asp-for="Files" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-5">
@@ -57,8 +56,26 @@ else
         </div>
     </div>
 
+    <div>
+        @foreach (var images in Model.Image)
+        {
+            <partial name="_Images" model="images" />
+            <input asp-action="removeImage" asp-controller="spaceship" asp-route-imageId="@images.ImageId"
+                   type="submit" class="btn btn-danger" value="Remove Image" />
+        }
+    </div>
 
-    <input asp-action="create" asp-controller="spaceship" type="submit" class="btn btn-primary" value="Create" />
+    <hr />
+
+    @if (Model.Id.HasValue)
+    {
+        <input asp-action="Update" asp-controller="Spaceship" type="submit" class="btn btn-primary" value="Update" />
+    }
+    else
+    {
+        <input asp-action="Create" asp-controller="Spaceship" type="submit" class="btn btn-primary" value="Create" />
+    }
+
     <a asp-action="Index" asp-controller="spaceship" class="btn btn-secondary">Back to List</a>
 
 </form>
