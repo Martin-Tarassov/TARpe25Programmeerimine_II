@@ -1,12 +1,16 @@
 ﻿namespace ShopTARpe25.Models.Kindergarten
 {
-    public class KindergartenUpdateViewModel
+    public class KindergartenCreateUpdateViewModel
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; } 
         public string GroupName { get; set; } = string.Empty;
         public int? ChildrenCount { get; set; }
         public string KindergartenName { get; set; } = string.Empty;
         public string TeacherName { get; set; } = string.Empty;
+
+        public List<IFormFile>? Files { get; set; } // uued failid mis kasutaja valib
+        public List<ImageViewModel> Images { get; set; } 
+            = new List<ImageViewModel>(); //  olemasolevad pildid
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

@@ -92,7 +92,7 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            var vm = new KindergartenUpdateViewModel
+            var vm = new KindergartenCreateUpdateViewModel
             {
                 Id = kindergarten.Id,
                 GroupName = kindergarten.GroupName,
@@ -107,7 +107,7 @@ namespace ShopTARpe25.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(KindergartenUpdateViewModel vm)
+        public async Task<IActionResult> Update(KindergartenCreateUpdateViewModel vm)
         {
             var dto = new KindergartenDto
             {
