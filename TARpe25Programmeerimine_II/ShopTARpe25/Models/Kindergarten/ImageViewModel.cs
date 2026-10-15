@@ -2,8 +2,8 @@
 {
     public class ImageViewModel // uus klass see hoiab pildi infot
     {
-        public Guid ImageId { get; set; } 
-        public string? FilePath { get; set; } 
-        public Guid? KindergartenId { get; set; } 
+        public Guid ImageId { get; set; } // pildi Id
+        public string? FilePath { get; set; } // pildi faili nimi
+        public Guid? KindergartenId { get; set; } // lasteaia Id
     }
 }

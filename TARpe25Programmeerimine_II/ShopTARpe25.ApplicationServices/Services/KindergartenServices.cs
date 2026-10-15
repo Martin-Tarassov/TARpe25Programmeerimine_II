@@ -9,23 +9,23 @@ namespace ShopTARpe25.ApplicationServices.Services
     public class KindergartenServices : IKindergartenServices
     {
         private readonly ShopTARpe25Context _context;
-        private readonly IFileServices _fileServices; //  failiteenus piltide jaoks
+        private readonly IFileServices _fileServices; // failiteenus piltide jaoks
 
         public KindergartenServices
             (
                 ShopTARpe25Context context,
-                IFileServices fileServices 
+                IFileServices fileServices // programm annab siia failiteenuse
             )
         {
             _context = context;
-            _fileServices = fileServices; 
+            _fileServices = fileServices; // salvestame failiteenuse
         }
 
         public async Task<Kindergarten> Create(KindergartenDto dto)
         {
             Kindergarten domain = new();
 
-            domain.Id = Guid.NewGuid(); 
+            domain.Id = Guid.NewGuid(); // Id on vaja enne salvestamist et pilte siduda
             domain.GroupName = dto.GroupName;
             domain.ChildrenCount = dto.ChildrenCount;
             domain.KindergartenName = dto.KindergartenName;
@@ -34,7 +34,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.UpdatedAt = DateTime.Now;
 
             await _context.Kindergartens.AddAsync(domain);
-            _fileServices.FilesToApi(dto, domain);
+            _fileServices.FilesToApi(dto, domain); // salvestame pildid
             await _context.SaveChangesAsync();
 
             return domain;
@@ -60,7 +60,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.CreatedAt = dto.CreatedAt;
             domain.UpdatedAt = DateTime.Now;
 
-            _fileServices.FilesToApi(dto, domain); 
+            _fileServices.FilesToApi(dto, domain); // lisame uued pildid
 
             _context.Kindergartens.Update(domain);
             await _context.SaveChangesAsync();
@@ -73,14 +73,14 @@ namespace ShopTARpe25.ApplicationServices.Services
             var result = await _context.Kindergartens
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (result == null) 
+            if (result == null) // kui lasteaeda ei ole
             {
-                return null; 
+                return null; // kustutada pole midagi
             }
 
             var images = await _context.FileToApis //  otsime selle lasteaia pildid
-                .Where(x => x.KindergartenId == id) 
-                .Select(y => new FileToApiDto 
+                .Where(x => x.KindergartenId == id) // ainult selle lasteaia pildid
+                .Select(y => new FileToApiDto // teeme pildist DTO
                 {
                     Id = y.Id,
                     KindergartenId = y.KindergartenId,

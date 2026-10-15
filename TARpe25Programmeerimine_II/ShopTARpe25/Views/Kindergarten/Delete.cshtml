@@ -7,27 +7,58 @@
     <hr />
 
     <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Id)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.Id)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.GroupName)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.GroupName)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ChildrenCount)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.ChildrenCount)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.KindergartenName)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.KindergartenName)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.TeacherName)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.TeacherName)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.CreatedAt)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.CreatedAt)</dd>
-
-        <dt class="col-sm-3">@Html.DisplayNameFor(m => m.UpdatedAt)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(m => m.UpdatedAt)</dd>
+        <div class="form-group row">
+            <label asp-for="Id" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.Id)
+        </div>
     </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="GroupName" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.GroupName)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="ChildrenCount" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.ChildrenCount)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="KindergartenName" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.KindergartenName)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="TeacherName" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.TeacherName)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="CreatedAt" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.CreatedAt)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="UpdatedAt" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.UpdatedAt)
+        </div>
+    </dl>
+
+    @foreach (var images in Model.Images)
+    {
+        <partial name="_Images" model="images" />
+    }
 
     <hr />
     <form asp-action="DeleteConfirmation" method="post">
@@ -35,4 +66,5 @@
         <input type="submit" value="Delete" class="btn btn-danger" />
         <a asp-action="Index" asp-controller="Kindergarten" class="btn btn-success">Back</a>
     </form>
+
 </div>

@@ -11,34 +11,35 @@
 <div class="h1">
     Kindergarten
 </div>
-
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th scope="col">Nr</th>
-            <th scope="col">Group</th>
-            <th scope="col">Children</th>
-            <th scope="col">Kindergarten</th>
-            <th scope="col">Teacher</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<form method="get">
+    <table class="table table-hover">
+        <thead>
             <tr>
-                <td>@rowNumber</td>
-                <td>@item.GroupName</td>
-                <td>@item.ChildrenCount</td>
-                <td>@item.KindergartenName</td>
-                <td>@item.TeacherName</td>
-                <td>
-                    <a asp-action="Details" asp-controller="Kindergarten" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                    <a asp-action="Update" asp-controller="Kindergarten" asp-route-id="@item.Id" class="btn btn-success">Update</a>
-                    <a asp-action="Delete" asp-controller="Kindergarten" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
-                </td>
+                <th scope="col">Nr</th>
+                <th scope="col">Group</th>
+                <th scope="col">Children</th>
+                <th scope="col">Kindergarten</th>
+                <th scope="col">Teacher</th>
+                <th scope="col"></th>
             </tr>
-            rowNumber++;
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var kindergarten in Model)
+            {
+                <tr>
+                    <td>@rowNumber</td>
+                    <td>@kindergarten.GroupName</td>
+                    <td>@kindergarten.ChildrenCount</td>
+                    <td>@kindergarten.KindergartenName</td>
+                    <td>@kindergarten.TeacherName</td>
+                    <td>
+                        <a asp-action="Details" asp-controller="Kindergarten" asp-route-id="@kindergarten.Id" class="btn btn-info">Details</a>
+                        <a asp-action="Update" asp-controller="Kindergarten" asp-route-id="@kindergarten.Id" class="btn btn-success">Update</a>
+                        <a asp-action="Delete" asp-controller="Kindergarten" asp-route-id="@kindergarten.Id" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+                rowNumber++;
+            }
+        </tbody>
+    </table>
+</form>

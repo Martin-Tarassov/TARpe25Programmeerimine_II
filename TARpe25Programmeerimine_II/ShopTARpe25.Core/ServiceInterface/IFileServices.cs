@@ -8,9 +8,9 @@ namespace ShopTARpe25.Core.ServiceInterface
 {
     public interface IFileServices
     {
-        void FilesToApi(SpaceshipDto dto, Spaceship domain);
-        void FilesToApi(KindergartenDto dto, Kindergarten domain);   // 
-        Task<FileToApi?> RemoveImageFromApi(FileToApiDto dto);
-        Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dto);
+        void FilesToApi(SpaceshipDto dto, Spaceship domain); 
+        void FilesToApi(KindergartenDto dto, Kindergarten domain);   // salvestab lasteaia pildid
+        Task<FileToApi?> RemoveImageFromApi(FileToApiDto dto); // kustutab ühe pildi
+        Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dto); // kustutab mitu pilti
     }
 }
