@@ -52,7 +52,10 @@ namespace ShopTARpe25.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(SpaceshipCreateUpdateViewModel vm)
         {
-            if (!ModelState.IsValid) return View(vm);
+            if (!ModelState.IsValid) 
+            {
+                return View(vm);
+            } 
 
             var dto = new SpaceshipDto
             {
