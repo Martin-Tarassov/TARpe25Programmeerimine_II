@@ -47,75 +47,72 @@ namespace ShopTARpe25.ApplicationServices.Services
 
         public void FilesToApi(KindergartenDto dto, Kindergarten domain) // salvestab lasteaia pildid
         {
-            if (dto.Files != null && dto.Files.Count > 0) 
+            if (dto.Files != null && dto.Files.Count > 0)
             {
-                string uploadsFolder = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload"); // piltide kausta tee
-
-                if (!Directory.Exists(uploadsFolder)) 
+                if (!Directory.Exists(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\"))
                 {
-                    Directory.CreateDirectory(uploadsFolder); // kui ei ole, teeme kausta
+                    Directory.CreateDirectory(_webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\");
                 }
 
-                foreach (var file in dto.Files) // võtame iga faili ükshaaval
+                foreach (var file in dto.Files)
                 {
+                    string uploadsFolder = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload");
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName; // unikaalne faili nimi
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName); // faili täielik tee
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create)) // avame faili kirjutamiseks
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         file.CopyTo(fileStream); // kopeerime faili kettale
+
+                        FileToApi path = new FileToApi // uus kirje andmebaasi jaoks
+                        {
+                            Id = Guid.NewGuid(),
+                            ExistingFilePath = uniqueFileName, // faili nimi
+                            KindergartenId = domain.Id // seome pildi lasteaiaga
+                        };
+                        _context.FileToApis.Add(path); // lisame kirje andmebaasi
                     }
-
-                    FileToApi path = new FileToApi // uus kirje andmebaasi jaoks
-                    {
-                        Id = Guid.NewGuid(), // kirje uus Id
-                        ExistingFilePath = uniqueFileName, // faili nimi
-                        KindergartenId = domain.Id // seome pildi lasteaiaga
-                    };
-
-                    _context.FileToApis.Add(path); // lisame kirje andmebaasi
                 }
             }
         }
-
-        public async Task<FileToApi?> RemoveImageFromApi(FileToApiDto dto) // kustutab ühe pildi
+        public async Task<FileToApi> RemoveImageFromApi(FileToApiDto dto) // kustutab ühe pildi
         {
-            var image = await _context.FileToApis // otsime pildi andmebaasist
-                .FirstOrDefaultAsync(x => x.Id == dto.Id); // võtame pildi, mille Id sobib
+            var imageId = await _context.FileToApis // otsime pildi andmebaasist
+                .FirstOrDefaultAsync(x => x.Id == dto.Id); // võtame pildi mille Id sobib
 
-            if (image == null) //kui pilti ei ole
-            {
-                return null; // kustutada pole midagi
-            }
-
-            var filePath = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload", image.ExistingFilePath); // Lisasin: faili tee kettal
+            var filePath = _webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\" // faili kausta tee
+                + imageId.ExistingFilePath; // lisame faili nime
 
             if (File.Exists(filePath)) 
             {
-                File.Delete(filePath); //  kustutame faili kettalt
+                File.Delete(filePath); // kustutame faili kettalt
             }
 
-            _context.FileToApis.Remove(image); // kustutame kirje andmebaasist
+            _context.FileToApis.Remove(imageId); // kustutame kirje andmebaasist
             await _context.SaveChangesAsync(); // salvestame muudatused
 
-            return image; // anname kustutatud pildi tagasi
+            return imageId; 
         }
-
         public async Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dto) // kustutab mitu pilti
         {
-            var removed = new List<FileToApi>(); // nimekiri kustutatud piltidest
 
             foreach (var image in dto) // võtame iga pildi ükshaaval
             {
-                var result = await RemoveImageFromApi(image); // kustutame pildi eelmise meetodiga
+                var imageId = await _context.FileToApis // otsime pildi andmebaasist
+                    .FirstOrDefaultAsync(x => x.Id == image.Id); // võtame pildi mille Id sobib
 
-                if (result != null) // kui pilt kustutati
+                var filePath = _webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\" // faili kausta tee
+                    + imageId.ExistingFilePath; // lisame faili nime
+
+                if (File.Exists(filePath)) 
                 {
-                    removed.Add(result); // lisame nimekirja
+                    File.Delete(filePath); // kustutame faili kettalt
                 }
-            }
 
-            return removed;
+                _context.FileToApis.Remove(imageId); // kustutame kirje andmebaasist
+                await _context.SaveChangesAsync(); // salvestame muudatused
+            }
+            return null; // nimekirja me ei kasuta seega anname null
         }
     }
 }
