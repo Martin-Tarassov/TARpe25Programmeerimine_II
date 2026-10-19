@@ -16,5 +16,7 @@ namespace ShopTARpe25.Core.Dto
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public DateTime? FoundedDate { get; set; } // lasteaia asutamise kuupäev
     }
 }

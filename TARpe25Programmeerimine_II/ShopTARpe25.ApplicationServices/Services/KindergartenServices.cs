@@ -30,6 +30,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.ChildrenCount = dto.ChildrenCount;
             domain.KindergartenName = dto.KindergartenName;
             domain.TeacherName = dto.TeacherName;
+            domain.FoundedDate = dto.FoundedDate; // asutamise kuupäev
             domain.CreatedAt = DateTime.Now;
             domain.UpdatedAt = DateTime.Now;
 
@@ -58,6 +59,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.KindergartenName = dto.KindergartenName;
             domain.TeacherName = dto.TeacherName;
             domain.CreatedAt = dto.CreatedAt;
+            domain.FoundedDate = dto.FoundedDate;
             domain.UpdatedAt = DateTime.Now;
 
             _fileServices.FilesToApi(dto, domain); // lisame uued pildid

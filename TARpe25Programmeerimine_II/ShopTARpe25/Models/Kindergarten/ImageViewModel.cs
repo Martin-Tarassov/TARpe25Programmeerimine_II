@@ -4,6 +4,6 @@
     {
         public Guid ImageId { get; set; } // pildi Id
         public string? FilePath { get; set; } // pildi faili nimi
-        public Guid? KindergartenId { get; set; } // lasteaia Id
+        public Guid? KindergartenId { get; set; } // lasteaia Id      
     }
 }

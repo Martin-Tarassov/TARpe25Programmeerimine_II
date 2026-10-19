@@ -55,6 +55,13 @@
         </div>
     </dl>
 
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="FoundedDate" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.FoundedDate)
+        </div>
+    </dl>
+
     @foreach (var image in Model.Images)
     {
         <partial name="_Images" model="image" />

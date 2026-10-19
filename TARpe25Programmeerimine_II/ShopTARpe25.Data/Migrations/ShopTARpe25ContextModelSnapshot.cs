@@ -54,6 +54,9 @@ namespace ShopTARpe25.Data.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("FoundedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("GroupName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

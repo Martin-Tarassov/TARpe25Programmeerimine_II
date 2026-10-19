@@ -34,7 +34,8 @@ namespace ShopTARpe25.Controllers
                     GroupName = x.GroupName,
                     ChildrenCount = x.ChildrenCount,
                     KindergartenName = x.KindergartenName,
-                    TeacherName = x.TeacherName
+                    TeacherName = x.TeacherName,
+                    FoundedDate = x.FoundedDate,
                 });
 
             return View(result);
@@ -56,6 +57,7 @@ namespace ShopTARpe25.Controllers
                 ChildrenCount = vm.ChildrenCount,
                 KindergartenName = vm.KindergartenName,
                 TeacherName = vm.TeacherName,
+                FoundedDate = vm.FoundedDate, // asutamise kuupäev
                 Files = vm.Files // failid
             };
 
@@ -90,6 +92,7 @@ namespace ShopTARpe25.Controllers
             vm.ChildrenCount = kindergarten.ChildrenCount;
             vm.KindergartenName = kindergarten.KindergartenName;
             vm.TeacherName = kindergarten.TeacherName;
+            vm.FoundedDate = kindergarten.FoundedDate; // asutamise kuupäev
             vm.CreatedAt = kindergarten.CreatedAt;
             vm.UpdatedAt = kindergarten.UpdatedAt;
             vm.Images.AddRange(images);
@@ -123,6 +126,7 @@ namespace ShopTARpe25.Controllers
             vm.ChildrenCount = kindergarten.ChildrenCount;
             vm.KindergartenName = kindergarten.KindergartenName;
             vm.TeacherName = kindergarten.TeacherName;
+            vm.FoundedDate = kindergarten.FoundedDate; // asutamise kuupäev
             vm.CreatedAt = kindergarten.CreatedAt;
             vm.UpdatedAt = kindergarten.UpdatedAt;
             vm.Images.AddRange(images);
@@ -142,7 +146,8 @@ namespace ShopTARpe25.Controllers
                 TeacherName = vm.TeacherName,
                 CreatedAt = vm.CreatedAt,
                 UpdatedAt = vm.UpdatedAt,
-                Files = vm.Files // uued failid
+                Files = vm.Files, // uued failid
+                FoundedDate = vm.FoundedDate
             };
 
             await _kindergartenServices.Update(dto);
@@ -167,6 +172,7 @@ namespace ShopTARpe25.Controllers
             vm.ChildrenCount = kindergarten.ChildrenCount;
             vm.KindergartenName = kindergarten.KindergartenName;
             vm.TeacherName = kindergarten.TeacherName;
+            vm.FoundedDate = kindergarten.FoundedDate; // asutamise kuupäev
             vm.CreatedAt = kindergarten.CreatedAt;
             vm.UpdatedAt = kindergarten.UpdatedAt;
 
