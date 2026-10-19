@@ -1,0 +1,83 @@
+﻿@model List<ShopTARpe25.Core.Domain.Book>
+
+<h1>Raamatud</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
+<h4>Lisa raamat</h4>
+<form asp-action="Add" method="post" class="mb-4">
+    <div class="mb-2">
+        <label class="form-label">Pealkiri</label>
+        <input name="title" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Autor</label>
+        <input name="author" class="form-control" required />
+    </div>
+    <div class="mb-2">
+        <label class="form-label">Aasta</label>
+        <input name="year" type="number" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Lisa raamat</button>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form asp-action="ByYear" method="get" class="input-group">
+            <input name="year" type="number" class="form-control" placeholder="Aasta" required />
+            <button type="submit" class="btn btn-secondary">Otsi aasta järgi</button>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <form asp-action="ByTitle" method="get" class="input-group">
+            <input name="title" class="form-control" placeholder="Pealkiri" required />
+            <button type="submit" class="btn btn-secondary">Otsi pealkirja järgi</button>
+        </form>
+    </div>
+</div>
+
+<p>
+    <a asp-action="Index" class="btn btn-outline-primary">Kõik raamatud</a>
+    <a asp-action="Borrowed" class="btn btn-outline-primary">Laenutatud raamatud</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Pealkiri</th>
+            <th>Autor</th>
+            <th>Aasta</th>
+            <th>Saadaval</th>
+            <th>Tegevused</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>@b.Title</td>
+                <td>@b.Author</td>
+                <td>@b.PublishedYear</td>
+                <td>@(b.IsAvailable ? "Jah" : "Ei")</td>
+                <td>
+                    <form asp-action="UpdateTitle" method="post" class="d-inline-flex gap-1">
+                        <input type="hidden" name="id" value="@b.Id" />
+                        <input name="newTitle" class="form-control form-control-sm" placeholder="Uus pealkiri" required />
+                        <button type="submit" class="btn btn-sm btn-warning">Muuda</button>
+                    </form>
+                    <form asp-action="Return" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@b.Id" />
+                        <button type="submit" class="btn btn-sm btn-success">Tagasta</button>
+                    </form>
+                    <form asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@b.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger">Kustuta</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

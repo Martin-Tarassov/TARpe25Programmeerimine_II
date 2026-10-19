@@ -11,6 +11,9 @@ namespace ShopTARpe25
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Raamatukogu teenus
+            builder.Services.AddScoped<IBookServices, BookServices>();
+
             builder.Services.AddScoped<IFileServices, FileServices>();
 
             builder.Services.AddControllersWithViews();

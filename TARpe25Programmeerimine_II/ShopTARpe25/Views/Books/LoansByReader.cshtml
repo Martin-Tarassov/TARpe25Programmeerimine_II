@@ -1,0 +1,19 @@
+﻿@model List<ShopTARpe25.Core.Domain.Loan>
+
+<h2>Lugeja laenutused</h2>
+
+<table class="table">
+    <tr>
+        <th>Raamat</th>
+        <th>Laenutatud</th>
+        <th>Tagastatud</th>
+    </tr>
+    @foreach (var l in Model)
+    {
+        <tr>
+            <td>@l.Book.Title</td>
+            <td>@l.LoanDate.ToShortDateString()</td>
+            <td>@(l.ReturnDate?.ToShortDateString() ?? "-")</td>
+        </tr>
+    }
+</table>
