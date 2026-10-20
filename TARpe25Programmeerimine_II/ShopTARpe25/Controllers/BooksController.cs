@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopTARpe25.Core.Domain;
+using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
+using ShopTARpe25.Models.Books;
 
 namespace ShopTARpe25.Controllers
 {
@@ -16,69 +18,205 @@ namespace ShopTARpe25.Controllers
         // Näita kõiki raamatuid
         public async Task<IActionResult> Index()
         {
-            return View(await _bookServices.GetAllAsync());
-        }
+            var books = await _bookServices.GetAll();
 
-        // Lisa raamat
-        [HttpPost]
-        public async Task<IActionResult> Add(string title, string author, int year)
-        {
-            await _bookServices.AddBookAsync(title, author, year);
-            return RedirectToAction(nameof(Index));
+            return View(ToIndex(books));
         }
 
         // Otsi aasta järgi
         public async Task<IActionResult> ByYear(int year)
         {
-            return View("Index", await _bookServices.GetBooksByYearAsync(year));
+            var books = await _bookServices.GetByYear(year);
+
+            return View("Index", ToIndex(books));
         }
 
         // Otsi pealkirja järgi
         public async Task<IActionResult> ByTitle(string title)
         {
-            var book = await _bookServices.GetBookByTitleAsync(title);
-            var list = new List<Book>();
+            var book = await _bookServices.GetByTitle(title);
+
+            // Teeme listi, et vaade töötaks sama moodi
+            var books = new List<Book>();
             if (book != null)
             {
-                list.Add(book);
+                books.Add(book);
             }
-            return View("Index", list);
+
+            return View("Index", ToIndex(books));
         }
 
-        // Näita laenutatud raamatuid
+        // Näita raamatuid, mis on laenutuses
         public async Task<IActionResult> Borrowed()
         {
-            return View("Index", await _bookServices.GetBorrowedBooksAsync());
+            var books = await _bookServices.GetBorrowed();
+
+            return View("Index", ToIndex(books));
         }
 
         // Näita ühe lugeja laenutusi
-        public async Task<IActionResult> LoansByReader(Guid readerId)
+        public async Task<IActionResult> Loans(Guid readerId)
         {
-            return View(await _bookServices.GetLoansByReaderAsync(readerId));
+            var loans = await _bookServices.GetLoansByReader(readerId);
+
+            var result = loans.Select(x => new LoanViewModel
+            {
+                Id = x.Id,
+                BookTitle = x.Book.Title,
+                LoanDate = x.LoanDate,
+                ReturnDate = x.ReturnDate
+            });
+
+            return View(result);
         }
 
-        // Muuda pealkirja
-        [HttpPost]
-        public async Task<IActionResult> UpdateTitle(Guid id, string newTitle)
+        // Näita tühja vormi uue raamatu jaoks
+        [HttpGet]
+        public IActionResult Create()
         {
-            await _bookServices.UpdateTitleAsync(id, newTitle);
+            var vm = new BookCreateUpdateViewModel();
+
+            return View("CreateUpdate", vm);
+        }
+
+        // Salvesta uus raamat
+        [HttpPost]
+        public async Task<IActionResult> Create(BookCreateUpdateViewModel vm)
+        {
+            var dto = new BookDto
+            {
+                Title = vm.Title,
+                Author = vm.Author,
+                PublishedYear = vm.PublishedYear
+            };
+
+            await _bookServices.Create(dto);
+
             return RedirectToAction(nameof(Index));
         }
 
-        // Märgi tagastatuks
+        // Näita ühe raamatu andmeid
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var book = await _bookServices.DetailsAsync(id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new BookDetailsViewModel();
+
+            vm.Id = book.Id;
+            vm.Title = book.Title;
+            vm.Author = book.Author;
+            vm.PublishedYear = book.PublishedYear;
+            vm.IsAvailable = book.IsAvailable;
+
+            return View(vm);
+        }
+
+        // Näita vormi raamatu muutmiseks
+        [HttpGet]
+        public async Task<IActionResult> Update(Guid id)
+        {
+            var book = await _bookServices.DetailsAsync(id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new BookCreateUpdateViewModel();
+
+            vm.Id = book.Id;
+            vm.Title = book.Title;
+            vm.Author = book.Author;
+            vm.PublishedYear = book.PublishedYear;
+
+            return View("CreateUpdate", vm);
+        }
+
+        // Salvesta muudatused
+        [HttpPost]
+        public async Task<IActionResult> Update(BookCreateUpdateViewModel vm)
+        {
+            var dto = new BookDto
+            {
+                Id = vm.Id,
+                Title = vm.Title,
+                Author = vm.Author,
+                PublishedYear = vm.PublishedYear
+            };
+
+            await _bookServices.Update(dto);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Näita lehte "Kas tõesti kustutada?"
+        [HttpGet]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var book = await _bookServices.DetailsAsync(id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new BookDeleteViewModel();
+
+            vm.Id = book.Id;
+            vm.Title = book.Title;
+            vm.Author = book.Author;
+            vm.PublishedYear = book.PublishedYear;
+            vm.IsAvailable = book.IsAvailable;
+
+            return View(vm);
+        }
+
+        // Kustuta raamat pärast kinnitust
+        [HttpPost]
+        public async Task<IActionResult> DeleteConfirmation(Guid id)
+        {
+            var book = await _bookServices.Delete(id);
+
+            // null tähendab: raamatut pole või sellel on laenutusi
+            if (book == null)
+            {
+                TempData["Message"] = "Raamatut ei saa kustutada, sellel on laenutusi.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Märgi raamat tagastatuks
         [HttpPost]
         public async Task<IActionResult> Return(Guid id)
         {
-            await _bookServices.ReturnBookAsync(id);
+            var book = await _bookServices.ReturnBook(id);
+
+            if (book == null)
+            {
+                TempData["Message"] = "Aktiivset laenutust ei leitud.";
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
-        // Kustuta raamat
-        [HttpPost]
-        public async Task<IActionResult> Delete(Guid id)
+        // Teeb raamatutest vaate andmed (ViewModel)
+        private static IEnumerable<BookIndexViewModel> ToIndex(IEnumerable<Book> books)
         {
-            TempData["Message"] = await _bookServices.DeleteBookAsync(id);
-            return RedirectToAction(nameof(Index));
+            return books.Select(x => new BookIndexViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Author = x.Author,
+                PublishedYear = x.PublishedYear,
+                IsAvailable = x.IsAvailable
+            });
         }
     }
 }

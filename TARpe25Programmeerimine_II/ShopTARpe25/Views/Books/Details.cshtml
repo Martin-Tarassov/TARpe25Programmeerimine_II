@@ -1,0 +1,38 @@
+﻿@model ShopTARpe25.Models.Books.BookDetailsViewModel
+
+<h1>Details</h1>
+
+<div>
+    <h4>Book</h4>
+    <hr />
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="Title" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.Title)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="Author" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.Author)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="PublishedYear" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.PublishedYear)
+        </div>
+    </dl>
+
+    <dl class="row">
+        <div class="form-group row">
+            <label asp-for="IsAvailable" class="col-sm-2 col-form-label"></label>
+            @Html.DisplayFor(model => model.IsAvailable)
+        </div>
+    </dl>
+
+    <a asp-action="Index" asp-controller="Books" class="btn btn-danger">Back to List</a>
+</div>

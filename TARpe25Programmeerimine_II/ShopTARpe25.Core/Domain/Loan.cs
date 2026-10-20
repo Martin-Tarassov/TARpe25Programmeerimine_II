@@ -2,10 +2,10 @@
 {
     public class Loan
     {
-        public Guid Id { get; set; }
-        public DateTime LoanDate { get; set; }
+        public Guid Id { get; set; } // laenutuse oma number
+        public DateTime LoanDate { get; set; }    // millal raamat võeti
 
-        // ? tähendab, et kuupäev võib puududa (raamat pole veel tagasi)
+        // ? tähendab, et kuupäev võib puududa
         public DateTime? ReturnDate { get; set; }
 
         // Mis raamat on laenutatud

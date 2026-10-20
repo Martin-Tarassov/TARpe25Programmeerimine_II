@@ -1,0 +1,25 @@
+﻿@model IEnumerable<ShopTARpe25.Models.Books.LoanViewModel>
+
+<div class="h1">
+    Reader loans
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Book</th>
+            <th scope="col">Loan date</th>
+            <th scope="col">Return date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var loan in Model)
+        {
+            <tr>
+                <td>@loan.BookTitle</td>
+                <td>@loan.LoanDate.ToShortDateString()</td>
+                <td>@(loan.ReturnDate?.ToShortDateString() ?? "-")</td>
+            </tr>
+        }
+    </tbody>
+</table>

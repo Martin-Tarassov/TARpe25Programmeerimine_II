@@ -1,83 +1,68 @@
-﻿@model List<ShopTARpe25.Core.Domain.Book>
+﻿@model IEnumerable<ShopTARpe25.Models.Books.BookIndexViewModel>
 
-<h1>Raamatud</h1>
+@{
+    int rowNumber = 1;
+}
+
+<div>
+    <a asp-action="Create" asp-controller="Books" class="btn btn-primary">Create</a>
+    <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">All</a>
+    <a asp-action="Borrowed" asp-controller="Books" class="btn btn-secondary">Borrowed</a>
+</div>
+
+<div class="h1">
+    Books
+</div>
 
 @if (TempData["Message"] != null)
 {
-    <div class="alert alert-info">@TempData["Message"]</div>
+    <div class="alert alert-warning">@TempData["Message"]</div>
 }
 
-<h4>Lisa raamat</h4>
-<form asp-action="Add" method="post" class="mb-4">
-    <div class="mb-2">
-        <label class="form-label">Pealkiri</label>
-        <input name="title" class="form-control" required />
+<form asp-action="ByYear" method="get">
+    <div class="input-group mb-2">
+        <input name="year" type="number" class="form-control" placeholder="Year" />
+        <button type="submit" class="btn btn-outline-primary">Search by year</button>
     </div>
-    <div class="mb-2">
-        <label class="form-label">Autor</label>
-        <input name="author" class="form-control" required />
-    </div>
-    <div class="mb-2">
-        <label class="form-label">Aasta</label>
-        <input name="year" type="number" class="form-control" required />
-    </div>
-    <button type="submit" class="btn btn-primary">Lisa raamat</button>
 </form>
 
-<div class="row mb-4">
-    <div class="col-md-6">
-        <form asp-action="ByYear" method="get" class="input-group">
-            <input name="year" type="number" class="form-control" placeholder="Aasta" required />
-            <button type="submit" class="btn btn-secondary">Otsi aasta järgi</button>
-        </form>
+<form asp-action="ByTitle" method="get">
+    <div class="input-group mb-3">
+        <input name="title" class="form-control" placeholder="Title" />
+        <button type="submit" class="btn btn-outline-primary">Search by title</button>
     </div>
-    <div class="col-md-6">
-        <form asp-action="ByTitle" method="get" class="input-group">
-            <input name="title" class="form-control" placeholder="Pealkiri" required />
-            <button type="submit" class="btn btn-secondary">Otsi pealkirja järgi</button>
-        </form>
-    </div>
-</div>
+</form>
 
-<p>
-    <a asp-action="Index" class="btn btn-outline-primary">Kõik raamatud</a>
-    <a asp-action="Borrowed" class="btn btn-outline-primary">Laenutatud raamatud</a>
-</p>
-
-<table class="table table-striped">
+<table class="table table-hover">
     <thead>
         <tr>
-            <th>Pealkiri</th>
-            <th>Autor</th>
-            <th>Aasta</th>
-            <th>Saadaval</th>
-            <th>Tegevused</th>
+            <th scope="col">Nr</th>
+            <th scope="col">Title</th>
+            <th scope="col">Author</th>
+            <th scope="col">Year</th>
+            <th scope="col">Available</th>
+            <th scope="col"></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var b in Model)
+        @foreach (var book in Model)
         {
             <tr>
-                <td>@b.Title</td>
-                <td>@b.Author</td>
-                <td>@b.PublishedYear</td>
-                <td>@(b.IsAvailable ? "Jah" : "Ei")</td>
+                <td>@rowNumber</td>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.PublishedYear</td>
+                <td>@(book.IsAvailable ? "Yes" : "No")</td>
                 <td>
-                    <form asp-action="UpdateTitle" method="post" class="d-inline-flex gap-1">
-                        <input type="hidden" name="id" value="@b.Id" />
-                        <input name="newTitle" class="form-control form-control-sm" placeholder="Uus pealkiri" required />
-                        <button type="submit" class="btn btn-sm btn-warning">Muuda</button>
-                    </form>
-                    <form asp-action="Return" method="post" class="d-inline">
-                        <input type="hidden" name="id" value="@b.Id" />
-                        <button type="submit" class="btn btn-sm btn-success">Tagasta</button>
-                    </form>
-                    <form asp-action="Delete" method="post" class="d-inline">
-                        <input type="hidden" name="id" value="@b.Id" />
-                        <button type="submit" class="btn btn-sm btn-danger">Kustuta</button>
+                    <a asp-action="Details" asp-controller="Books" asp-route-id="@book.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Update" asp-controller="Books" asp-route-id="@book.Id" class="btn btn-success">Update</a>
+                    <a asp-action="Delete" asp-controller="Books" asp-route-id="@book.Id" class="btn btn-danger">Delete</a>
+                    <form asp-action="Return" asp-controller="Books" asp-route-id="@book.Id" method="post" class="d-inline">
+                        <input type="submit" value="Return" class="btn btn-warning" />
                     </form>
                 </td>
             </tr>
+            rowNumber++;
         }
     </tbody>
 </table>

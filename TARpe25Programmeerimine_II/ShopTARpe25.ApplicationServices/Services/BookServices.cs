@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Domain;
+using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 
@@ -9,106 +10,149 @@ namespace ShopTARpe25.ApplicationServices.Services
     {
         private readonly ShopTARpe25Context _context;
 
-        public BookServices(ShopTARpe25Context context) 
+        public BookServices(ShopTARpe25Context context)
         {
             _context = context;
         }
 
-        //3 uue raamatu lisamine
-        public async Task<Book> AddBookAsync(string title, string author, int year)
+        // Ül 3:lisa uus raamat
+        public async Task<Book> Create(BookDto dto)
         {
-            var book = new Book
-            {
-                Id = Guid.NewGuid(),
-                Title = title,
-                Author = author,
-                PublishedYear = year,
-                IsAvailable = true // uus raamat on alati saadaval
-            };
+            Book domain = new();
 
-            _context.Books.Add(book);
+            domain.Id = Guid.NewGuid();
+            domain.Title = dto.Title;
+            domain.Author = dto.Author;
+            domain.PublishedYear = dto.PublishedYear ?? 0;
+            domain.IsAvailable = true; // uus raamat on alati saadaval
+
+            await _context.Books.AddAsync(domain);
+            await _context.SaveChangesAsync(); // salvesta andmebaasi
+
+            return domain;
+        }
+
+        // Leia üks raamat id järgi
+        public async Task<Book> DetailsAsync(Guid id)
+        {
+            var result = await _context.Books
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return result;
+        }
+
+        // Ül 5: muuda raamatu andmeid
+        public async Task<Book> Update(BookDto dto)
+        {
+            // Leia raamat andmebaasist
+            var domain = await _context.Books
+                .FirstOrDefaultAsync(x => x.Id == dto.Id);
+
+            // Kui raamatut pole, ei tee midagi
+            if (domain == null)
+            {
+                return null;
+            }
+
+            domain.Title = dto.Title;
+            domain.Author = dto.Author;
+            domain.PublishedYear = dto.PublishedYear ?? 0;
+
             await _context.SaveChangesAsync();
-            return book;
+
+            return domain;
+        }
+
+        // Ül 5: kustuta raamat
+        public async Task<Book> Delete(Guid id)
+        {
+            var result = await _context.Books
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (result == null)
+            {
+                return null; // raamatut ei leitud
+            }
+
+            // Enne kustutamist tuleb kontrollida:
+            // kas raamatul on laenutusi 
+            // Kui on, siis ei tohi kustutada.
+            // Muidu läheks laenutuste ajalugu kaduma
+            // ja andmebaas annaks vea 
+            // Kontrolli ka, kas raamat on praegu laenutatud
+            // Siis tuleb see enne tagastada
+            bool hasLoans = await _context.Loans
+                .AnyAsync(x => x.BookId == id);
+
+            if (hasLoans)
+            {
+                return null;
+            }
+
+            _context.Books.Remove(result);
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
+
+        // Ül 5: märgi raamat tagastatuks
+        public async Task<Book> ReturnBook(Guid id)
+        {
+            // Leia laenutus, mis pole veel tagastatud (ReturnDate on null)
+            var loan = await _context.Loans
+                .Include(x => x.Book)
+                .FirstOrDefaultAsync(x => x.BookId == id && x.ReturnDate == null);
+
+            if (loan == null)
+            {
+                return null; // aktiivset laenutust pole
+            }
+
+            loan.ReturnDate = DateTime.Now;  // salvesta tagastamise kuupäev
+            loan.Book.IsAvailable = true;    // raamat on jälle saadaval
+            await _context.SaveChangesAsync();
+
+            return loan.Book;
         }
 
         // Kõik raamatud
-        public async Task<List<Book>> GetAllAsync()
+        public async Task<List<Book>> GetAll()
         {
             return await _context.Books.ToListAsync();
         }
 
-        //4 raamatud ilmumisaasta järgi
-        public async Task<List<Book>> GetBooksByYearAsync(int year)
+        // Ülesanne 4: raamatud ilmumisaasta järgi 
+        public async Task<List<Book>> GetByYear(int year)
         {
             return await _context.Books
-                .Where(b => b.PublishedYear == year)
+                .Where(x => x.PublishedYear == year) // Where valib sobivad read
                 .ToListAsync();
         }
 
-        //4 raamat pealkirja järgi
-        public async Task<Book?> GetBookByTitleAsync(string title)
+        // Ülesanne 4: raamat pealkirja järgi
+        public async Task<Book> GetByTitle(string title)
         {
+            // FirstOrDefault võtab esimese sobiva raamatu
+            // Kui sobivat pole, tuleb null
             return await _context.Books
-                .FirstOrDefaultAsync(b => b.Title == title);
+                .FirstOrDefaultAsync(x => x.Title == title);
         }
 
-        // 4 raamatud, mis on laenutuses (saadavus on false)
-        public async Task<List<Book>> GetBorrowedBooksAsync()
+        // Ül 4: raamatud, mis on praegu laenutatud 
+        public async Task<List<Book>> GetBorrowed()
         {
             return await _context.Books
-                .Where(b => !b.IsAvailable)
+                .Where(x => !x.IsAvailable)
                 .ToListAsync();
         }
 
-        // 4 ühe lugeja kõik laenutused
-        public async Task<List<Loan>> GetLoansByReaderAsync(Guid readerId)
+        // Ül 4: ühe lugeja kõik laenutused
+        public async Task<List<Loan>> GetLoansByReader(Guid readerId)
         {
             return await _context.Loans
-                .Include(l => l.Book) // võta ka raamatu andmed
-                .Where(l => l.ReaderId == readerId)
+                .Include(x => x.Book) // Include võtab kaasa ka raamatu andmed
+                .Where(x => x.ReaderId == readerId)
                 .ToListAsync();
-        }
-
-        // 5 pealkirja muutmine
-        public async Task<bool> UpdateTitleAsync(Guid bookId, string newTitle)
-        {
-            var book = await _context.Books.FindAsync(bookId);
-            if (book == null) return false; // raamatut ei leitud
-
-            book.Title = newTitle;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        // 5 raamatu tagastamine
-        public async Task<bool> ReturnBookAsync(Guid bookId)
-        {
-            var loan = await _context.Loans
-                .Include(l => l.Book)
-                .FirstOrDefaultAsync(l => l.BookId == bookId && l.ReturnDate == null);
-
-            if (loan == null) return false; // sellist laenutust pole
-
-            loan.ReturnDate = DateTime.Now; // salvesta tagastamise kuupäev
-            loan.Book.IsAvailable = true;   // raamat on jälle saadaval
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        // 5 raamatu kustutamine
-        public async Task<string> DeleteBookAsync(Guid bookId)
-        {
-            var book = await _context.Books.FindAsync(bookId);
-            if (book == null)
-                return "Raamatut ei leitud.";
-
-            bool hasLoans = await _context.Loans.AnyAsync(l => l.BookId == bookId);
-            if (hasLoans)
-                return "Raamatut ei saa kustutada, sest sellel on laenutusi.";
-
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
-            return "Raamat on kustutatud.";
         }
     }
 }

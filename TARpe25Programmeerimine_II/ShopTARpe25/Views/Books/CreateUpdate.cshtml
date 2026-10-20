@@ -1,0 +1,48 @@
+﻿@model ShopTARpe25.Models.Books.BookCreateUpdateViewModel
+
+@if (Model.Id.HasValue)
+{
+    <h1>Book Update</h1>
+}
+else
+{
+    <h1>Book Create</h1>
+}
+
+<form method="post">
+    <input asp-for="Id" type="hidden" />
+
+    <div>
+        <label asp-for="Title" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Title" class="form-control" />
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="Author" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Author" class="form-control" />
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="PublishedYear" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="PublishedYear" class="form-control" />
+        </div>
+    </div>
+
+    <hr />
+
+    @if (Model.Id.HasValue)
+    {
+        <input asp-action="Update" asp-controller="Books" type="submit" class="btn btn-primary" value="Update" />
+    }
+    else
+    {
+        <input asp-action="Create" asp-controller="Books" type="submit" class="btn btn-primary" value="Create" />
+    }
+
+    <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">Back to List</a>
+</form>

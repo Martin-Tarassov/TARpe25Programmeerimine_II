@@ -1,26 +1,20 @@
 ﻿using ShopTARpe25.Core.Domain;
+using ShopTARpe25.Core.Dto;
 
 namespace ShopTARpe25.Core.ServiceInterface
 {
+    // Siin on kõik tegevused, mida raamatutega saab teha
     public interface IBookServices
     {
-        // Lisa uus raamat
-        Task<Book> AddBookAsync(string title, string author, int year);
-        // Kõik raamatud
-        Task<List<Book>> GetAllAsync();
-        // Otsi aasta järgi
-        Task<List<Book>> GetBooksByYearAsync(int year);
-        // Otsi pealkirja järgi
-        Task<Book?> GetBookByTitleAsync(string title);
-        // Raamatud, mis on praegu laenutatud
-        Task<List<Book>> GetBorrowedBooksAsync();
-        // Ühe lugeja laenutused
-        Task<List<Loan>> GetLoansByReaderAsync(Guid readerId);
-        // Muuda pealkirja
-        Task<bool> UpdateTitleAsync(Guid bookId, string newTitle);
-        // Märgi raamat tagastatuks
-        Task<bool> ReturnBookAsync(Guid bookId);
-        // Kustuta raamat
-        Task<string> DeleteBookAsync(Guid bookId);
+        Task<Book> Create(BookDto dto); // lisa raamat
+        Task<Book> DetailsAsync(Guid id); // leia üks raamat
+        Task<Book> Update(BookDto dto); // muuda raamatut
+        Task<Book> Delete(Guid id); // kustuta raamat
+        Task<Book> ReturnBook(Guid id); // märgi tagastatuks
+        Task<List<Book>> GetAll(); // kõik raamatud
+        Task<List<Book>> GetByYear(int year); // otsi aasta järgi
+        Task<Book> GetByTitle(string title); // otsi pealkirja järgi
+        Task<List<Book>> GetBorrowed(); // laenutatud raamatud
+        Task<List<Loan>> GetLoansByReader(Guid readerId); // lugeja laenutused
     }
 }
