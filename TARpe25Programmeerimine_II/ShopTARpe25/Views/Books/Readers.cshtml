@@ -3,7 +3,10 @@
 @{
     int rowNumber = 1;
 }
-
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-warning">@TempData["Message"]</div>
+}
 <div>
     <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">Back to Books</a>
     <a asp-action="CreateReader" asp-controller="Books" class="btn btn-primary">Create</a>
@@ -31,6 +34,12 @@
                 <td>@reader.Email</td>
                 <td>
                     <a asp-action="Loans" asp-controller="Books" asp-route-readerId="@reader.Id" class="btn btn-info">Loans</a>
+                </td>
+                <td>
+                    <a asp-action="Loans" asp-controller="Books" asp-route-readerId="@reader.Id" class="btn btn-info">Loans</a>
+                    <form asp-action="DeleteReader" asp-controller="Books" asp-route-id="@reader.Id" method="post" class="d-inline">
+                        <input type="submit" value="Delete" class="btn btn-danger" />
+                    </form>
                 </td>
             </tr>
             rowNumber++;

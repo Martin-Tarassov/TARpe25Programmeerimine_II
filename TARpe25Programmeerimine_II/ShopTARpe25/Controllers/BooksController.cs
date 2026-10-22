@@ -106,6 +106,20 @@ namespace ShopTARpe25.Controllers
 
             return RedirectToAction(nameof(Readers));
         }
+        // Kustuta lugeja
+        [HttpPost]
+        public async Task<IActionResult> DeleteReader(Guid id)
+        {
+            var reader = await _bookServices.DeleteReader(id);
+
+            // null tähendab: lugejat pole või tal on tagastamata raamat
+            if (reader == null)
+            {
+                TempData["Message"] = "Lugejat ei saa kustutada, tal on tagastamata raamat.";
+            }
+
+            return RedirectToAction(nameof(Readers));
+        }
 
         // Näita tühja vormi uue raamatu jaoks
         [HttpGet]

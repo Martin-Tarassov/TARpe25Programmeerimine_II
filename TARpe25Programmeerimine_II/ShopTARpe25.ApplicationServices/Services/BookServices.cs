@@ -200,5 +200,37 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             return domain;
         }
+        // Kustuta lugeja
+        public async Task<Reader> DeleteReader(Guid id)
+        {
+            var result = await _context.Readers
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (result == null)
+            {
+                return null; // lugejat ei leitud
+            }
+
+            // Kontroll: kui lugejal on raamat veel tagastamata, ei kustuta
+            bool hasActiveLoan = await _context.Loans
+                .AnyAsync(x => x.ReaderId == id && x.ReturnDate == null);
+
+            if (hasActiveLoan)
+            {
+                return null;
+            }
+
+            // Tagastatud laenutused kustutatakse koos lugejaga,
+            // muidu andmebaas annaks võõrvõtme vea
+            var oldLoans = await _context.Loans
+                .Where(x => x.ReaderId == id)
+                .ToListAsync();
+
+            _context.Loans.RemoveRange(oldLoans);
+            _context.Readers.Remove(result);
+            await _context.SaveChangesAsync();
+
+            return result;
+        }
     }
 }
