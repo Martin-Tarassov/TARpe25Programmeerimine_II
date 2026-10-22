@@ -60,6 +60,8 @@
                     <a asp-action="Delete" asp-controller="Books" asp-route-id="@book.Id" class="btn btn-danger">Delete</a>
                     <form asp-action="Return" asp-controller="Books" asp-route-id="@book.Id" method="post" class="d-inline">
                         <input type="submit" value="Return" class="btn btn-warning" />
+                        <a asp-action="Borrow" asp-controller="Books" asp-route-id="@book.Id" class="btn btn-primary">Borrow</a>
+
                     </form>
                 </td>
             </tr>

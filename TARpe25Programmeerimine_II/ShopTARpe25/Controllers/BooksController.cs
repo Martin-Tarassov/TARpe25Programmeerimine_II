@@ -83,6 +83,29 @@ namespace ShopTARpe25.Controllers
 
             return View(result);
         }
+        // Näita tühja vormi uue lugeja jaoks
+        [HttpGet]
+        public IActionResult CreateReader()
+        {
+            var vm = new ReaderCreateViewModel();
+
+            return View(vm);
+        }
+
+        // Salvesta uus lugeja
+        [HttpPost]
+        public async Task<IActionResult> CreateReader(ReaderCreateViewModel vm)
+        {
+            var dto = new ReaderDto
+            {
+                FullName = vm.FullName,
+                Email = vm.Email
+            };
+
+            await _bookServices.CreateReader(dto);
+
+            return RedirectToAction(nameof(Readers));
+        }
 
         // Näita tühja vormi uue raamatu jaoks
         [HttpGet]
@@ -215,6 +238,46 @@ namespace ShopTARpe25.Controllers
             if (book == null)
             {
                 TempData["Message"] = "Aktiivset laenutust ei leitud.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        // Näita lehte, kus valitakse lugeja
+        [HttpGet]
+        public async Task<IActionResult> Borrow(Guid id)
+        {
+            var book = await _bookServices.DetailsAsync(id);
+
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            var readers = await _bookServices.GetAllReaders();
+
+            var vm = new BorrowViewModel();
+
+            vm.BookId = book.Id;
+            vm.BookTitle = book.Title;
+            vm.Readers = readers.Select(x => new ReaderViewModel
+            {
+                Id = x.Id,
+                FullName = x.FullName,
+                Email = x.Email
+            }).ToList();
+
+            return View(vm);
+        }
+
+        // Laenuta raamat
+        [HttpPost]
+        public async Task<IActionResult> Borrow(BorrowViewModel vm)
+        {
+            var loan = await _bookServices.BorrowBook(vm.BookId, vm.ReaderId);
+
+            if (loan == null)
+            {
+                TempData["Message"] = "Raamatut ei saa laenutada, see pole saadaval.";
             }
 
             return RedirectToAction(nameof(Index));

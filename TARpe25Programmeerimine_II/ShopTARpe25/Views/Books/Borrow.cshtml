@@ -1,0 +1,22 @@
+﻿@model ShopTARpe25.Models.Books.BorrowViewModel
+
+<h1>Borrow</h1>
+<h4>@Model.BookTitle</h4>
+
+<form method="post">
+    <input asp-for="BookId" type="hidden" />
+
+    <div>
+        <label asp-for="ReaderId" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <select asp-for="ReaderId" class="form-control"
+                    asp-items="@(new SelectList(Model.Readers, "Id", "FullName"))">
+            </select>
+        </div>
+    </div>
+
+    <hr />
+
+    <input asp-action="Borrow" asp-controller="Books" type="submit" class="btn btn-primary" value="Borrow" />
+    <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">Back to List</a>
+</form>

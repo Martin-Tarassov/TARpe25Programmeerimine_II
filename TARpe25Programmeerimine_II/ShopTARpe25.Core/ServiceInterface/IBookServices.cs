@@ -17,5 +17,7 @@ namespace ShopTARpe25.Core.ServiceInterface
         Task<List<Book>> GetBorrowed(); // laenutatud raamatud
         Task<List<Loan>> GetLoansByReader(Guid readerId); // lugeja laenutused
         Task<List<Reader>> GetAllReaders();    // kõik lugejad
+        Task<Reader> CreateReader(ReaderDto dto);   // lisa lugeja
+        Task<Loan> BorrowBook(Guid bookId, Guid readerId);   // laenuta raamat
     }
 }

@@ -159,5 +159,46 @@ namespace ShopTARpe25.ApplicationServices.Services
         {
             return await _context.Readers.ToListAsync();
         }
+        // Lisa uus lugeja
+        public async Task<Reader> CreateReader(ReaderDto dto)
+        {
+            Reader domain = new();
+
+            domain.Id = Guid.NewGuid();
+            domain.FullName = dto.FullName;
+            domain.Email = dto.Email;
+
+            await _context.Readers.AddAsync(domain);
+            await _context.SaveChangesAsync(); // salvesta andmebaasi
+
+            return domain;
+        }
+        // Laenuta raamat lugejale
+        public async Task<Loan> BorrowBook(Guid bookId, Guid readerId)
+        {
+            var book = await _context.Books
+                .FirstOrDefaultAsync(x => x.Id == bookId);
+
+            // Kui raamatut pole või see pole saadaval, ei laenuta
+            if (book == null || !book.IsAvailable)
+            {
+                return null;
+            }
+
+            Loan domain = new();
+
+            domain.Id = Guid.NewGuid();
+            domain.BookId = bookId;
+            domain.ReaderId = readerId;
+            domain.LoanDate = DateTime.Now;
+            domain.ReturnDate = null;   // pole veel tagastatud
+
+            book.IsAvailable = false;   // raamat pole enam saadaval
+
+            await _context.Loans.AddAsync(domain);
+            await _context.SaveChangesAsync();
+
+            return domain;
+        }
     }
 }
