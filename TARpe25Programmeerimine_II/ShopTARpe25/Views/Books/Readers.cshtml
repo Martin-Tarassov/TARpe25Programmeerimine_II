@@ -1,0 +1,38 @@
+﻿@model IEnumerable<ShopTARpe25.Models.Books.ReaderViewModel>
+
+@{
+    int rowNumber = 1;
+}
+
+<div>
+    <a asp-action="Index" asp-controller="Books" class="btn btn-secondary">Back to Books</a>
+</div>
+
+<div class="h1">
+    Readers
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th scope="col">Nr</th>
+            <th scope="col">Full name</th>
+            <th scope="col">Email</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var reader in Model)
+        {
+            <tr>
+                <td>@rowNumber</td>
+                <td>@reader.FullName</td>
+                <td>@reader.Email</td>
+                <td>
+                    <a asp-action="Loans" asp-controller="Books" asp-route-readerId="@reader.Id" class="btn btn-info">Loans</a>
+                </td>
+            </tr>
+            rowNumber++;
+        }
+    </tbody>
+</table>

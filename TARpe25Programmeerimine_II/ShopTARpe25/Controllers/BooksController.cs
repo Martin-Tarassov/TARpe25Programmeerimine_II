@@ -69,6 +69,20 @@ namespace ShopTARpe25.Controllers
 
             return View(result);
         }
+        // Näita kõiki lugejaid
+        public async Task<IActionResult> Readers()
+        {
+            var readers = await _bookServices.GetAllReaders();
+
+            var result = readers.Select(x => new ReaderViewModel
+            {
+                Id = x.Id,
+                FullName = x.FullName,
+                Email = x.Email
+            });
+
+            return View(result);
+        }
 
         // Näita tühja vormi uue raamatu jaoks
         [HttpGet]

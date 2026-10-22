@@ -154,5 +154,10 @@ namespace ShopTARpe25.ApplicationServices.Services
                 .Where(x => x.ReaderId == readerId)
                 .ToListAsync();
         }
+        // Kõik lugejad
+        public async Task<List<Reader>> GetAllReaders()
+        {
+            return await _context.Readers.ToListAsync();
+        }
     }
 }
