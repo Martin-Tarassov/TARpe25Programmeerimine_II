@@ -16,9 +16,15 @@ namespace ShopTARpe25
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddScoped<ISpaceshipServices, SpaceshipServices>();
+           
+            builder.Services.AddScoped<IRealEstateServices, RealEstateServices>();
+
 
             builder.Services.AddDbContext<ShopTARpe25Context>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            builder.Services.AddDbContext<ShopTARpe25Context>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("SecondConnection")));
 
             var app = builder.Build();
 
@@ -32,7 +38,6 @@ namespace ShopTARpe25
             app.UseRouting();
 
             app.UseAuthorization();
-            app.UseStaticFiles();
 
             app.MapStaticAssets();
             app.MapControllerRoute(
