@@ -25,6 +25,23 @@ namespace ShopTARpe25.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Realestates",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Area = table.Column<double>(type: "float", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomNumber = table.Column<int>(type: "int", nullable: false),
+                    BuildingType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Realestates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Spaceships",
                 columns: table => new
                 {
@@ -48,6 +65,9 @@ namespace ShopTARpe25.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "FileToApis");
+
+            migrationBuilder.DropTable(
+                name: "Realestates");
 
             migrationBuilder.DropTable(
                 name: "Spaceships");

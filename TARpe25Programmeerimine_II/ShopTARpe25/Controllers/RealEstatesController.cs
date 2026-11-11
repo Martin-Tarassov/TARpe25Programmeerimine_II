@@ -24,13 +24,13 @@ namespace ShopTARpe25.Controllers
         public IActionResult Index()
         {
             var result = _context.Realestates
-                .Select(x => new RealEstateIndexViewModel
+                .Select(vm => new RealEstateIndexViewModel
                 {
-                    Id = x.Id,
-                    Address = x.Address,
-                    Area = x.Area,
-                    RoomNumber = x.RoomNumber,
-                    BuildingType = x.BuildingType
+                    Id = vm.Id,
+                    Address = vm.Address,
+                    Area = vm.Area,
+                    RoomNumber = vm.RoomNumber,
+                    BuildingType = vm.BuildingType
                 });
 
             return View(result);
@@ -48,7 +48,7 @@ namespace ShopTARpe25.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("CreateUpdate", vm);
+                return View(vm);
             }
 
             var dto = new RealEstateDto
@@ -116,8 +116,15 @@ namespace ShopTARpe25.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(RealEstateCreateUpdateViewModel vm)
+        public async Task<IActionResult> Update(RealEstateCreateUpdateViewModel vm, Guid? id)
         {
+            vm.Id ??= id;
+
+            if (vm.Id == null)
+            {
+                return NotFound();
+            }
+
             var dto = new RealEstateDto
             {
                 Id = vm.Id,

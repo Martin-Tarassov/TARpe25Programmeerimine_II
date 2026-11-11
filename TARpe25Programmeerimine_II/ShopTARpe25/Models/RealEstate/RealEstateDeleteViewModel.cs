@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ShopTARpe25.Models.RealEstates
+﻿namespace ShopTARpe25.Models.RealEstates
 {
     public class RealEstateDeleteViewModel
     {
@@ -9,7 +7,7 @@ namespace ShopTARpe25.Models.RealEstates
         public string? Address { get; set; }
         public int RoomNumber { get; set; }
         public string? BuildingType { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime ModifiedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
     }
 }

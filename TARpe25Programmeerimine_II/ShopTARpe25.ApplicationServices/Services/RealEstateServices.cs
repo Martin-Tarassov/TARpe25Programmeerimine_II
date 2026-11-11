@@ -3,8 +3,6 @@ using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
-using System;
-using System.Threading.Tasks;
 
 namespace ShopTARpe25.ApplicationServices.Services
 {
@@ -12,7 +10,10 @@ namespace ShopTARpe25.ApplicationServices.Services
     {
         private readonly ShopTARpe25Context _context;
 
-        public RealEstateServices(ShopTARpe25Context context)
+        public RealEstateServices
+            (
+                ShopTARpe25Context context
+            )
         {
             _context = context;
         }
@@ -24,7 +25,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.Id = Guid.NewGuid();
             domain.Area = dto.Area;
             domain.Address = dto.Address;
-            domain.RoomNumber = dto.RoomNumber ?? 0;
+            domain.RoomNumber = dto.RoomNumber;
             domain.BuildingType = dto.BuildingType;
             domain.CreatedAt = DateTime.Now;
             domain.ModifiedAt = DateTime.Now;
@@ -35,7 +36,7 @@ namespace ShopTARpe25.ApplicationServices.Services
             return domain;
         }
 
-        public async Task<RealEstate> DetailAsync(Guid id)
+        public async Task<RealEstate> DetailsAsync(Guid id)
         {
             var result = await _context.Realestates
                 .FirstOrDefaultAsync(x => x.Id == id);
@@ -47,12 +48,12 @@ namespace ShopTARpe25.ApplicationServices.Services
         {
             RealEstate domain = new();
 
-            domain.Id = dto.Id ?? Guid.NewGuid();
+            domain.Id = dto.Id;
             domain.Area = dto.Area;
             domain.Address = dto.Address;
-            domain.RoomNumber = dto.RoomNumber ?? 0;
+            domain.RoomNumber = dto.RoomNumber;
             domain.BuildingType = dto.BuildingType;
-            domain.CreatedAt = dto.CreatedAt ?? DateTime.Now;
+            domain.CreatedAt = dto.CreatedAt;
             domain.ModifiedAt = DateTime.Now;
 
             _context.Realestates.Update(domain);
@@ -66,11 +67,8 @@ namespace ShopTARpe25.ApplicationServices.Services
             var result = await _context.Realestates
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            if (result != null)
-            {
-                _context.Realestates.Remove(result);
-                await _context.SaveChangesAsync();
-            }
+            _context.Realestates.Remove(result);
+            await _context.SaveChangesAsync();
 
             return result;
         }

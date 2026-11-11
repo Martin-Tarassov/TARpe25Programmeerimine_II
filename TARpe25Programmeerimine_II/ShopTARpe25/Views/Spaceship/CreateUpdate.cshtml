@@ -60,7 +60,7 @@ else
         @foreach (var images in Model.Image)
         {
             <partial name="_Images" model="images" />
-            <input asp-action="removeImage" asp-controller="spaceship" asp-route-imageId="@images.ImageId"
+            <input asp-action="RemoveImage" asp-controller="Spaceship" asp-route-imageId="@images.ImageId"
                    type="submit" class="btn btn-danger" value="Remove Image" />
         }
     </div>
@@ -69,13 +69,14 @@ else
 
     @if (Model.Id.HasValue)
     {
-        <input asp-action="Update" asp-controller="Spaceship" type="submit" class="btn btn-primary" value="Update" />
+        <input asp-action="Update" asp-controller="Spaceship" asp-route-id="@Model.Id"
+               type="submit" class="btn btn-primary" value="Update" />
     }
     else
     {
         <input asp-action="Create" asp-controller="Spaceship" type="submit" class="btn btn-primary" value="Create" />
     }
 
-    <a asp-action="Index" asp-controller="spaceship" class="btn btn-secondary">Back to List</a>
+    <a asp-action="Index" asp-controller="Spaceship" class="btn btn-secondary">Back to List</a>
 
 </form>

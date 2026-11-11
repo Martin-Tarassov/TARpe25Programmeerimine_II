@@ -1,46 +1,59 @@
 ﻿@model ShopTARpe25.Models.RealEstates.RealEstateCreateUpdateViewModel
 
-<h1>@(Model.Id == null ? "Create" : "Update")</h1>
+@if (Model.Id.HasValue)
+{
+    <h1>Real Estate Update</h1>
+}
+else
+{
+    <h1>Real Estate Create</h1>
+}
 
-<div>
-    <h4>Real Estate</h4>
+<form method="post">
+    <input asp-for="Id" type="hidden" />
+    <input asp-for="CreatedAt" type="hidden" />
+    <input asp-for="ModifiedAt" type="hidden" />
+
+    <div>
+        <label asp-for="Address" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Address" class="form-control" />
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="Area" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="Area" class="form-control" />
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="RoomNumber" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="RoomNumber" class="form-control" />
+        </div>
+    </div>
+
+    <div>
+        <label asp-for="BuildingType" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="BuildingType" class="form-control" />
+        </div>
+    </div>
+
     <hr />
 
-    <form asp-action="@(Model.Id == null ? "Create" : "Update")" method="post">
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="CreatedAt" />
-        <input type="hidden" asp-for="ModifiedAt" />
+    @if (Model.Id.HasValue)
+    {
+        <input asp-action="Update" asp-controller="RealEstates" asp-route-id="@Model.Id"
+               type="submit" class="btn btn-primary" value="Update" />
+    }
+    else
+    {
+        <input asp-action="Create" asp-controller="RealEstates" type="submit" class="btn btn-primary" value="Create" />
+    }
 
-        <div class="form-group row">
-            <label asp-for="Address" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <input asp-for="Address" class="form-control" />
-            </div>
-        </div>
+    <a asp-action="Index" asp-controller="RealEstates" class="btn btn-secondary">Back to List</a>
 
-        <div class="form-group row">
-            <label asp-for="Area" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <input asp-for="Area" class="form-control" />
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label asp-for="RoomNumber" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <input asp-for="RoomNumber" class="form-control" />
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label asp-for="BuildingType" class="col-sm-2 col-form-label"></label>
-            <div class="col-sm-10">
-                <input asp-for="BuildingType" class="form-control" />
-            </div>
-        </div>
-
-        <hr />
-        <input type="submit" value="@(Model.Id == null ? "Create" : "Update")" class="btn btn-primary" />
-        <a asp-action="Index" asp-controller="RealEstates" class="btn btn-success">Back</a>
-    </form>
-</div>
+</form>

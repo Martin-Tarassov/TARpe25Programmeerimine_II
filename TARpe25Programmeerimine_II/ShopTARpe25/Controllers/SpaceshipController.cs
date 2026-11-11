@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ShopTARpe25.ApplicationServices.Services;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
@@ -52,10 +51,10 @@ namespace ShopTARpe25.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(SpaceshipCreateUpdateViewModel vm)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
             {
-                return View(vm);
-            } 
+                return View("CreateUpdate", vm);
+            }
 
             var dto = new SpaceshipDto
             {
@@ -72,7 +71,6 @@ namespace ShopTARpe25.Controllers
                         ExistingFilePath = file.FilePath,
                         SpaceshipId = file.SpaceshipId
                     }).ToArray()
-
             };
 
             var result = await _spaceshipService.Create(dto);
@@ -83,7 +81,6 @@ namespace ShopTARpe25.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-
         }
 
         [HttpGet]
@@ -131,13 +128,14 @@ namespace ShopTARpe25.Controllers
             }
 
             var images = await _context.FileToApis
-               .Where(x => x.SpaceshipId == id)
-               .Select(y => new ImageViewModel
-               {
-                   FilePath = y.ExistingFilePath,
-                   ImageId = y.Id,
-                   SpaceshipId = y.SpaceshipId
-               }).ToListAsync();
+                .Where(x => x.SpaceshipId == id)
+                .Select(y => new ImageViewModel
+                {
+                    FilePath = y.ExistingFilePath,
+                    ImageId = y.Id,
+                    SpaceshipId = y.SpaceshipId
+                }).ToListAsync();
+
             var vm = new SpaceshipCreateUpdateViewModel();
 
             vm.Id = spaceship.Id;
@@ -150,12 +148,19 @@ namespace ShopTARpe25.Controllers
             vm.ModifiedAt = spaceship.ModifiedAt;
             vm.Image.AddRange(images);
 
-            return View("CreateUpdate" , vm);
+            return View("CreateUpdate", vm);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(SpaceshipUpdateViewModel vm)
+        public async Task<IActionResult> Update(SpaceshipCreateUpdateViewModel vm, Guid? id)
         {
+            vm.Id ??= id;
+
+            if (vm.Id == null)
+            {
+                return NotFound();
+            }
+
             var dto = new SpaceshipDto
             {
                 Id = vm.Id,
@@ -167,14 +172,15 @@ namespace ShopTARpe25.Controllers
                 CreatedAt = vm.CreatedAt,
                 ModifiedAt = vm.ModifiedAt,
                 Files = vm.Files,
-                FileToApiDtos = vm.Images
+                FileToApiDtos = vm.Image
                     .Select(file => new FileToApiDto
                     {
-                         Id = file.ImageId,
-                         ExistingFilePath = file.FilePath,
-                         SpaceshipId = file.SpaceshipId
+                        Id = file.ImageId,
+                        ExistingFilePath = file.FilePath,
+                        SpaceshipId = file.SpaceshipId
                     }).ToArray()
             };
+
             var result = await _spaceshipService.Update(dto);
 
             if (result == null)
@@ -207,13 +213,13 @@ namespace ShopTARpe25.Controllers
             vm.ModifiedAt = spaceship.ModifiedAt;
 
             var images = await _context.FileToApis
-                 .Where(x => x.SpaceshipId == id)
-                 .Select(y => new ImageViewModel
-                 {
-                     ImageId = y.Id,
-                     FilePath = y.ExistingFilePath,
-                     SpaceshipId = y.SpaceshipId
-                 }).ToListAsync();
+                .Where(x => x.SpaceshipId == id)
+                .Select(y => new ImageViewModel
+                {
+                    ImageId = y.Id,
+                    FilePath = y.ExistingFilePath,
+                    SpaceshipId = y.SpaceshipId
+                }).ToListAsync();
 
             vm.Images.AddRange(images);
 
@@ -234,17 +240,16 @@ namespace ShopTARpe25.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveImage(ImageViewModel vm)
+        public async Task<IActionResult> RemoveImage(Guid imageId)
         {
             var dto = new FileToApiDto
             {
-                Id = vm.ImageId
+                Id = imageId
             };
 
-            var image = await _fileServices.RemoveImageFromApi(dto);
+            await _fileServices.RemoveImageFromApi(dto);
 
             return RedirectToAction(nameof(Index));
         }
-
     }
 }

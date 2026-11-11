@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace ShopTARpe25.Models.RealEstates
+﻿namespace ShopTARpe25.Models.RealEstates
 {
     public class RealEstateIndexViewModel
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public string? Address { get; set; }
         public double? Area { get; set; }
         public int RoomNumber { get; set; }
