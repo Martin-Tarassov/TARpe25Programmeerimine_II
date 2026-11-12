@@ -56,10 +56,12 @@
     </dl>
 
     <hr />
-    <div class="text-center my-4">
+    <div class="my-4">
         @foreach (var images in Model.Images)
         {
-            <partial name="_RealEstateImages" model="images" />
+            <div>
+                <img src="~/multipleFileUpload/@images.FilePath" style="max-height:350px;" />
+            </div>
         }
     </div>
 

@@ -52,13 +52,13 @@ else
     <div>
         @foreach (var images in Model.Image)
         {
-            <img src="~/multipleFileUpload/@images.FilePath" class="img-thumbnail m-1" />
-            <input asp-action="RemoveImage" asp-controller="RealEstates" asp-route-imageId="@images.ImageId"
-                   type="submit" class="btn btn-danger" value="Remove Image" />
+            <div class="my-3">
+                <partial name="_RealEstateImages" model="images" />
+                <input asp-action="RemoveImage" asp-controller="RealEstates" asp-route-imageId="@images.ImageId"
+                       type="submit" class="btn btn-danger" value="Remove Image" />
+            </div>
         }
     </div>
-
-    <hr />
 
     @if (Model.Id.HasValue)
     {

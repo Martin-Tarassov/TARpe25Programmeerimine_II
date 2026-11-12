@@ -56,10 +56,12 @@
     </dl>
 
     <hr />
-    @foreach (var images in Model.Images)
-    {
-        <img src="~/multipleFileUpload/@images.FilePath" class="img-thumbnail m-1" />
-    }
+    <div class="my-4">
+        @foreach (var images in Model.Images)
+        {
+            <partial name="_RealEstateImages" model="images" />
+        }
+    </div>
     <form asp-action="DeleteConfirmation">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" />
