@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
@@ -10,15 +11,18 @@ namespace ShopTARpe25.Controllers
     {
         private readonly IRealEstateServices _realEstateServices;
         private readonly ShopTARpe25Context _context;
+        private readonly IFileServices _fileServices;
 
         public RealEstatesController
             (
                 IRealEstateServices realEstateServices,
-                ShopTARpe25Context context
+                ShopTARpe25Context context,
+                IFileServices fileServices
             )
         {
             _realEstateServices = realEstateServices;
             _context = context;
+            _fileServices = fileServices;
         }
 
         public IActionResult Index()
@@ -48,7 +52,7 @@ namespace ShopTARpe25.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(vm);
+                return View("CreateUpdate", vm);
             }
 
             var dto = new RealEstateDto
@@ -56,7 +60,8 @@ namespace ShopTARpe25.Controllers
                 Area = vm.Area,
                 Address = vm.Address,
                 RoomNumber = vm.RoomNumber,
-                BuildingType = vm.BuildingType
+                BuildingType = vm.BuildingType,
+                Files = vm.Files
             };
 
             var result = await _realEstateServices.Create(dto);
@@ -79,6 +84,15 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
+            var images = await _context.FileToApis
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    FilePath = y.ExistingFilePath,
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId
+                }).ToListAsync();
+
             var vm = new RealEstateDetailsViewModel();
 
             vm.Id = realEstate.Id;
@@ -88,6 +102,7 @@ namespace ShopTARpe25.Controllers
             vm.BuildingType = realEstate.BuildingType;
             vm.CreatedAt = realEstate.CreatedAt;
             vm.ModifiedAt = realEstate.ModifiedAt;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
@@ -102,6 +117,15 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
+            var images = await _context.FileToApis
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    FilePath = y.ExistingFilePath,
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId
+                }).ToListAsync();
+
             var vm = new RealEstateCreateUpdateViewModel();
 
             vm.Id = realEstate.Id;
@@ -111,6 +135,7 @@ namespace ShopTARpe25.Controllers
             vm.BuildingType = realEstate.BuildingType;
             vm.CreatedAt = realEstate.CreatedAt;
             vm.ModifiedAt = realEstate.ModifiedAt;
+            vm.Image.AddRange(images);
 
             return View("CreateUpdate", vm);
         }
@@ -133,7 +158,8 @@ namespace ShopTARpe25.Controllers
                 RoomNumber = vm.RoomNumber,
                 BuildingType = vm.BuildingType,
                 CreatedAt = vm.CreatedAt,
-                ModifiedAt = vm.ModifiedAt
+                ModifiedAt = vm.ModifiedAt,
+                Files = vm.Files
             };
 
             var result = await _realEstateServices.Update(dto);
@@ -156,6 +182,15 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
+            var images = await _context.FileToApis
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    FilePath = y.ExistingFilePath,
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId
+                }).ToListAsync();
+
             var vm = new RealEstateDeleteViewModel();
 
             vm.Id = realEstate.Id;
@@ -165,6 +200,7 @@ namespace ShopTARpe25.Controllers
             vm.BuildingType = realEstate.BuildingType;
             vm.CreatedAt = realEstate.CreatedAt;
             vm.ModifiedAt = realEstate.ModifiedAt;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
@@ -178,6 +214,19 @@ namespace ShopTARpe25.Controllers
             {
                 return NotFound();
             }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveImage(Guid imageId)
+        {
+            var dto = new FileToApiDto
+            {
+                Id = imageId
+            };
+
+            await _fileServices.RemoveImageFromApi(dto);
 
             return RedirectToAction(nameof(Index));
         }
