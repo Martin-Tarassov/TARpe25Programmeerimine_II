@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
@@ -77,31 +78,24 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            var realEstate = await _realEstateServices.DetailsAsync(id);
+            var result = await _realEstateServices.DetailsAsync(id);
 
-            if (realEstate == null)
+            if (result == null)
             {
-                return NotFound();
+                ModelState.AddModelError("", "Real estate detail failed.");
+                return View(nameof(Index));
             }
-
-            var images = await _context.FileToApis
-                .Where(x => x.RealEstateId == id)
-                .Select(y => new RealEstateImageViewModel
-                {
-                    FilePath = y.ExistingFilePath,
-                    ImageId = y.Id,
-                    RealEstateId = y.RealEstateId
-                }).ToListAsync();
+            RealEstateImageViewModel[] images = await FileFromDatabase(id);
 
             var vm = new RealEstateDetailsViewModel();
 
-            vm.Id = realEstate.Id;
-            vm.Area = realEstate.Area;
-            vm.Address = realEstate.Address;
-            vm.RoomNumber = realEstate.RoomNumber;
-            vm.BuildingType = realEstate.BuildingType;
-            vm.CreatedAt = realEstate.CreatedAt;
-            vm.ModifiedAt = realEstate.ModifiedAt;
+            vm.Id = result.Id;
+            vm.Area = result.Area;
+            vm.Address = result.Address;
+            vm.RoomNumber = result.RoomNumber;
+            vm.BuildingType = result.BuildingType;
+            vm.CreatedAt = result.CreatedAt;
+            vm.ModifiedAt = result.ModifiedAt;
             vm.Images.AddRange(images);
 
             return View(vm);
@@ -117,14 +111,7 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            var images = await _context.FileToApis
-                .Where(x => x.RealEstateId == id)
-                .Select(y => new RealEstateImageViewModel
-                {
-                    FilePath = y.ExistingFilePath,
-                    ImageId = y.Id,
-                    RealEstateId = y.RealEstateId
-                }).ToListAsync();
+            var images = await FileFromDatabase(id);
 
             var vm = new RealEstateCreateUpdateViewModel();
 
@@ -182,14 +169,7 @@ namespace ShopTARpe25.Controllers
                 return NotFound();
             }
 
-            var images = await _context.FileToApis
-                .Where(x => x.RealEstateId == id)
-                .Select(y => new RealEstateImageViewModel
-                {
-                    FilePath = y.ExistingFilePath,
-                    ImageId = y.Id,
-                    RealEstateId = y.RealEstateId
-                }).ToListAsync();
+            var images = await FileFromDatabase(id);
 
             var vm = new RealEstateDeleteViewModel();
 
@@ -221,14 +201,36 @@ namespace ShopTARpe25.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveImage(Guid imageId)
         {
-            var dto = new FileToApiDto
+            var image = await _context.FileToDatabases
+                .FirstOrDefaultAsync(x => x.Id == imageId);
+
+            if (image == null)
             {
-                Id = imageId
-            };
+                return NotFound();
+            }
 
-            await _fileServices.RemoveImageFromApi(dto);
+            var realEstateId = image.RealEstateId;
 
-            return RedirectToAction(nameof(Index));
+            _context.FileToDatabases.Remove(image);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Update), new { id = realEstateId });
+        }
+
+        private async Task<RealEstateImageViewModel[]> FileFromDatabase(Guid id)
+        {
+            var result = await _context.FileToDatabases
+                .Where(x => x.RealEstateId == id)
+                .Select(y => new RealEstateImageViewModel
+                {
+                    ImageId = y.Id,
+                    RealEstateId = y.RealEstateId,
+                    ImageData = y.ImageData,
+                    ImageTitle = y.ImageTitle,
+                    Image = string.Format("data:image/gif;base64,{0}", Convert.ToBase64String(y.ImageData))
+                }).ToArrayAsync();
+
+            return result;
         }
     }
 }
