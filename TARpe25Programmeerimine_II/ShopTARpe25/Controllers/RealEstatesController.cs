@@ -4,6 +4,7 @@ using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 using ShopTARpe25.Models.RealEstates;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ShopTARpe25.Controllers
 {
@@ -85,17 +86,16 @@ namespace ShopTARpe25.Controllers
 
             RealEstateImageViewModel[] images = await FileFromDatabase(id);
 
-            var vm = new RealEstateCreateUpdateViewModel
-            {
-                Id = result.Id,
-                Area = result.Area,
-                Address = result.Address,
-                RoomNumber = result.RoomNumber,
-                BuildingType = result.BuildingType,
-                CreatedAt = result.CreatedAt,
-                ModifiedAt = result.ModifiedAt,
-                Image = images.ToList()
-            };
+            var vm = new RealEstateCreateUpdateViewModel();
+
+            vm.Id = result.Id;
+            vm.Area = result.Area;
+            vm.Address = result.Address;
+            vm.RoomNumber = result.RoomNumber;
+            vm.BuildingType = result.BuildingType;
+            vm.CreatedAt = result.CreatedAt;
+            vm.ModifiedAt = result.ModifiedAt;
+            vm.Image.AddRange(images);
 
             return View("CreateUpdate", vm);
         }
