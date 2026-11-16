@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
@@ -10,32 +9,29 @@ namespace ShopTARpe25.Controllers
 {
     public class RealEstatesController : Controller
     {
-        private readonly IRealEstateServices _realEstateServices;
         private readonly ShopTARpe25Context _context;
-        private readonly IFileServices _fileServices;
+        private readonly IRealEstateServices _realEstateServices;
 
         public RealEstatesController
             (
-                IRealEstateServices realEstateServices,
                 ShopTARpe25Context context,
-                IFileServices fileServices
+                IRealEstateServices realEstateServices
             )
         {
-            _realEstateServices = realEstateServices;
             _context = context;
-            _fileServices = fileServices;
+            _realEstateServices = realEstateServices;
         }
 
         public IActionResult Index()
         {
             var result = _context.Realestates
-                .Select(vm => new RealEstateIndexViewModel
+                .Select(x => new RealEstateIndexViewModel
                 {
-                    Id = vm.Id,
-                    Address = vm.Address,
-                    Area = vm.Area,
-                    RoomNumber = vm.RoomNumber,
-                    BuildingType = vm.BuildingType
+                    Id = x.Id,
+                    Address = x.Address,
+                    Area = x.Area,
+                    BuildingType = x.BuildingType,
+                    RoomNumber = x.RoomNumber,
                 });
 
             return View(result);
@@ -44,85 +40,62 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var vm = new RealEstateCreateUpdateViewModel();
-            return View("CreateUpdate", vm);
+            RealEstateCreateUpdateViewModel result = new();
+
+            return View("CreateUpdate", result);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(RealEstateCreateUpdateViewModel vm)
+        public async Task<IActionResult> Create(RealEstateCreateUpdateViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View("CreateUpdate", vm);
+                return View("CreateUpdate", model);
             }
 
-            var dto = new RealEstateDto
+            var dto = new RealEstateDto()
             {
-                Area = vm.Area,
-                Address = vm.Address,
-                RoomNumber = vm.RoomNumber,
-                BuildingType = vm.BuildingType,
-                Files = vm.Files
+                Area = model.Area,
+                Address = model.Address,
+                RoomNumber = model.RoomNumber,
+                BuildingType = model.BuildingType,
+                Files = model.Files
             };
 
             var result = await _realEstateServices.Create(dto);
 
             if (result == null)
             {
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Real estate creation failed.");
+                return View("CreateUpdate", model);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id)
+        public async Task<IActionResult> Update(Guid id)
         {
             var result = await _realEstateServices.DetailsAsync(id);
 
             if (result == null)
             {
-                ModelState.AddModelError("", "Real estate detail failed.");
-                return View(nameof(Index));
-            }
-            RealEstateImageViewModel[] images = await FileFromDatabase(id);
-
-            var vm = new RealEstateDetailsViewModel();
-
-            vm.Id = result.Id;
-            vm.Area = result.Area;
-            vm.Address = result.Address;
-            vm.RoomNumber = result.RoomNumber;
-            vm.BuildingType = result.BuildingType;
-            vm.CreatedAt = result.CreatedAt;
-            vm.ModifiedAt = result.ModifiedAt;
-            vm.Images.AddRange(images);
-
-            return View(vm);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Update(Guid id)
-        {
-            var realEstate = await _realEstateServices.DetailsAsync(id);
-
-            if (realEstate == null)
-            {
                 return NotFound();
             }
 
-            var images = await FileFromDatabase(id);
+            RealEstateImageViewModel[] images = await FileFromDatabase(id);
 
-            var vm = new RealEstateCreateUpdateViewModel();
-
-            vm.Id = realEstate.Id;
-            vm.Area = realEstate.Area;
-            vm.Address = realEstate.Address;
-            vm.RoomNumber = realEstate.RoomNumber;
-            vm.BuildingType = realEstate.BuildingType;
-            vm.CreatedAt = realEstate.CreatedAt;
-            vm.ModifiedAt = realEstate.ModifiedAt;
-            vm.Image.AddRange(images);
+            var vm = new RealEstateCreateUpdateViewModel
+            {
+                Id = result.Id,
+                Area = result.Area,
+                Address = result.Address,
+                RoomNumber = result.RoomNumber,
+                BuildingType = result.BuildingType,
+                CreatedAt = result.CreatedAt,
+                ModifiedAt = result.ModifiedAt,
+                Image = images.ToList()
+            };
 
             return View("CreateUpdate", vm);
         }
@@ -153,7 +126,8 @@ namespace ShopTARpe25.Controllers
 
             if (result == null)
             {
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Real estate update failed.");
+                return View("CreateUpdate", vm);
             }
 
             return RedirectToAction(nameof(Index));
@@ -162,25 +136,26 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var realEstate = await _realEstateServices.DetailsAsync(id);
+            var result = await _realEstateServices.DetailsAsync(id);
 
-            if (realEstate == null)
+            if (result == null)
             {
                 return NotFound();
             }
 
-            var images = await FileFromDatabase(id);
+            RealEstateImageViewModel[] images = await FileFromDatabase(id);
 
-            var vm = new RealEstateDeleteViewModel();
-
-            vm.Id = realEstate.Id;
-            vm.Area = realEstate.Area;
-            vm.Address = realEstate.Address;
-            vm.RoomNumber = realEstate.RoomNumber;
-            vm.BuildingType = realEstate.BuildingType;
-            vm.CreatedAt = realEstate.CreatedAt;
-            vm.ModifiedAt = realEstate.ModifiedAt;
-            vm.Images.AddRange(images);
+            var vm = new RealEstateDeleteViewModel
+            {
+                Id = result.Id,
+                Area = result.Area,
+                Address = result.Address,
+                RoomNumber = result.RoomNumber,
+                BuildingType = result.BuildingType,
+                CreatedAt = result.CreatedAt,
+                ModifiedAt = result.ModifiedAt,
+                Images = images.ToList()
+            };
 
             return View(vm);
         }
@@ -192,10 +167,37 @@ namespace ShopTARpe25.Controllers
 
             if (realEstate == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            var result = await _realEstateServices.DetailsAsync(id);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            RealEstateImageViewModel[] images = await FileFromDatabase(id);
+
+            //siin toimub info edasi liikumine dto-st viewModelini
+            var vm = new RealEstateDetailsViewModel();
+
+            vm.Id = result.Id;
+            vm.Area = result.Area;
+            vm.Address = result.Address;
+            vm.RoomNumber = result.RoomNumber;
+            vm.BuildingType = result.BuildingType;
+            vm.CreatedAt = result.CreatedAt;
+            vm.ModifiedAt = result.ModifiedAt;
+            vm.Images.AddRange(images);
+
+            return View(vm);
         }
 
         [HttpPost]
@@ -224,7 +226,7 @@ namespace ShopTARpe25.Controllers
                 .Select(y => new RealEstateImageViewModel
                 {
                     ImageId = y.Id,
-                    RealEstateId = y.RealEstateId,
+                    RealEstateId = y.Id,
                     ImageData = y.ImageData,
                     ImageTitle = y.ImageTitle,
                     Image = string.Format("data:image/gif;base64,{0}", Convert.ToBase64String(y.ImageData))

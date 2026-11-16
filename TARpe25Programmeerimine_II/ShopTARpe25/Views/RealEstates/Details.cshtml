@@ -54,15 +54,13 @@
             @Html.DisplayFor(model => model.ModifiedAt)
         </div>
     </dl>
-
-    <hr />
-    <div class="my-4">
+    <dl>
         @foreach (var images in Model.Images)
         {
-            <div>
-                <img src="~/multipleFileUpload/@images.FilePath" style="max-height:350px;" />
-            </div>
+            <partial name="_Images" model="images" />
         }
-    </div>
+    </dl>
 
     <a asp-action="Index" asp-controller="RealEstates" class="btn btn-success">Back</a>
+
+</div>
