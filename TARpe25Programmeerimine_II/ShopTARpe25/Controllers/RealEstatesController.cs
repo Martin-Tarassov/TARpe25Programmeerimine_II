@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ShopTARpe25.ApplicationServices.Services;
+using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
@@ -12,15 +14,18 @@ namespace ShopTARpe25.Controllers
     {
         private readonly ShopTARpe25Context _context;
         private readonly IRealEstateServices _realEstateServices;
+        private readonly IFileServices _fileServices;
 
         public RealEstatesController
             (
                 ShopTARpe25Context context,
-                IRealEstateServices realEstateServices
+                IRealEstateServices realEstateServices,
+                IFileServices fileServices
             )
         {
             _context = context;
             _realEstateServices = realEstateServices;
+            _fileServices = fileServices;
         }
 
         public IActionResult Index()
@@ -145,17 +150,16 @@ namespace ShopTARpe25.Controllers
 
             RealEstateImageViewModel[] images = await FileFromDatabase(id);
 
-            var vm = new RealEstateDeleteViewModel
-            {
-                Id = result.Id,
-                Area = result.Area,
-                Address = result.Address,
-                RoomNumber = result.RoomNumber,
-                BuildingType = result.BuildingType,
-                CreatedAt = result.CreatedAt,
-                ModifiedAt = result.ModifiedAt,
-                Images = images.ToList()
-            };
+            var vm = new RealEstateDeleteViewModel();
+
+            vm.Id = result.Id;
+            vm.Area = result.Area;
+            vm.Address = result.Address;
+            vm.RoomNumber = result.RoomNumber;
+            vm.BuildingType = result.BuildingType;
+            vm.CreatedAt = result.CreatedAt;
+            vm.ModifiedAt = result.ModifiedAt;
+            vm.Images.AddRange(images);
 
             return View(vm);
         }
@@ -201,21 +205,21 @@ namespace ShopTARpe25.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveImage(Guid imageId)
+        public async Task<IActionResult> RemoveImage(RealEstateImageViewModel vm)
         {
-            var image = await _context.FileToDatabases
-                .FirstOrDefaultAsync(x => x.Id == imageId);
+           var dto = new FileToDatabaseDto()
+           {
+                Id = vm.ImageId
+           };
+
+           var image = await _fileServices.RemoveImageFromDatabase(dto);
+
+           var realEstateId = image.RealEstateId;
 
             if (image == null)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
-
-            var realEstateId = image.RealEstateId;
-
-            _context.FileToDatabases.Remove(image);
-            await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Update), new { id = realEstateId });
         }
 

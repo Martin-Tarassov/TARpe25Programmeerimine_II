@@ -53,7 +53,7 @@ else
         @foreach (var images in Model.Image)
         {
             <partial name="_Images" model="images" />
-            <input asp-action="RemoveImage" asp-controller="RealEstates" asp-route-imageId="@images.ImageId"
+            <input asp-action="RemoveImage" asp-controller="RealEstates" asp-route-ImageId="@images.ImageId"
                    type="submit" class="btn btn-danger" value="Remove Image" />
         }
     </div>
