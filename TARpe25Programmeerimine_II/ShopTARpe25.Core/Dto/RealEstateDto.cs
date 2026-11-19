@@ -11,6 +11,7 @@ namespace ShopTARpe25.Core.Dto
         public string? BuildingType { get; set; }
 
         public List<IFormFile>? Files { get; set; }
+        public FileToDatabaseDto[]? Image { get; set; }
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }

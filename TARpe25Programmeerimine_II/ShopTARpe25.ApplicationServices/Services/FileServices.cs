@@ -5,6 +5,7 @@ using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 
+
 namespace ShopTARpe25.ApplicationServices.Services
 {
     public class FileServices : IFileServices
@@ -33,6 +34,7 @@ namespace ShopTARpe25.ApplicationServices.Services
 
                 foreach (var file in dto.Files)
                 {
+
                     string uploadsFolder = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload");
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -47,17 +49,19 @@ namespace ShopTARpe25.ApplicationServices.Services
                             ExistingFilePath = uniqueFileName,
                             SpaceshipId = domain.Id
                         };
+
                         _context.FileToApis.AddAsync(path);
-                    }                
+                    }
                 }
             }
         }
+
         public async Task<FileToApi> RemoveImageFromApi(FileToApiDto dto)
         {
             var imageId = await _context.FileToApis
                 .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-            var filePath = _webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\" 
+            var filePath = _webHost.ContentRootPath + "\\wwwroot\\multipleFileUpload\\"
                 + imageId.ExistingFilePath;
 
             if (File.Exists(filePath))
@@ -69,12 +73,10 @@ namespace ShopTARpe25.ApplicationServices.Services
             await _context.SaveChangesAsync();
 
             return imageId;
-
-
         }
+
         public async Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dto)
         {
-            
             foreach (var image in dto)
             {
                 var imageId = await _context.FileToApis
@@ -87,12 +89,13 @@ namespace ShopTARpe25.ApplicationServices.Services
                 {
                     File.Delete(filePath);
                 }
-
                 _context.FileToApis.Remove(imageId);
                 await _context.SaveChangesAsync();
             }
+
             return null;
         }
+
         public void UploadFilesToDatabase(RealEstateDto dto, RealEstate domain)
         {
             if (dto.Files != null && dto.Files.Count > 0)
@@ -101,11 +104,11 @@ namespace ShopTARpe25.ApplicationServices.Services
                 {
                     using (var target = new MemoryStream())
                     {
-                        FileToDatabase files = new FileToDatabase
+                        FileToDatabase files = new FileToDatabase()
                         {
                             Id = Guid.NewGuid(),
                             ImageTitle = file.FileName,
-                            RealEstateId = domain.Id
+                            RealEstateId = domain.Id,
                         };
 
                         file.CopyTo(target);
@@ -121,24 +124,17 @@ namespace ShopTARpe25.ApplicationServices.Services
             var image = await _context.FileToDatabases
                 .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-            if (image == null)
-            {
-                return null;
-            }
-
             _context.FileToDatabases.Remove(image);
             await _context.SaveChangesAsync();
 
             return image;
         }
-        public async Task<List<FileToDatabase>> RemoveImagesFromDatabase(FileToDatabaseDto[] dtos)
+        public async Task<FileToDatabase> RemoveImagesFromDatabase(FileToDatabaseDto[] dto)
         {
-            var removed = new List<FileToDatabase>();
-
-            foreach (var dto in dtos)
+            foreach (var file in dto)
             {
                 var image = await _context.FileToDatabases
-                    .FirstOrDefaultAsync(x => x.Id == dto.Id);
+                    .FirstOrDefaultAsync(x => x.Id == file.Id);
 
                 if (image == null)
                 {
@@ -146,12 +142,11 @@ namespace ShopTARpe25.ApplicationServices.Services
                 }
 
                 _context.FileToDatabases.Remove(image);
-                removed.Add(image);
             }
 
             await _context.SaveChangesAsync();
 
-            return removed;
+            return null;
         }
     }
 }

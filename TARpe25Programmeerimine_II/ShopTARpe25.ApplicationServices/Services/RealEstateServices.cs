@@ -4,6 +4,7 @@ using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 
+
 namespace ShopTARpe25.ApplicationServices.Services
 {
     public class RealEstateServices : IRealEstateServices
@@ -21,9 +22,10 @@ namespace ShopTARpe25.ApplicationServices.Services
             _fileServices = fileServices;
         }
 
+
         public async Task<RealEstate> Create(RealEstateDto dto)
         {
-            RealEstate domain = new();
+            RealEstate domain = new RealEstate();
 
             domain.Id = Guid.NewGuid();
             domain.Area = dto.Area;
@@ -44,17 +46,9 @@ namespace ShopTARpe25.ApplicationServices.Services
             return domain;
         }
 
-        public async Task<RealEstate> DetailsAsync(Guid id)
-        {
-            var result = await _context.Realestates
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            return result;
-        }
-
         public async Task<RealEstate> Update(RealEstateDto dto)
         {
-            RealEstate domain = new();
+            RealEstate domain = new RealEstate();
 
             domain.Id = dto.Id;
             domain.Area = dto.Area;
@@ -73,6 +67,14 @@ namespace ShopTARpe25.ApplicationServices.Services
             await _context.SaveChangesAsync();
 
             return domain;
+        }
+
+        public async Task<RealEstate> DetailAsync(Guid id)
+        {
+            var result = await _context.Realestates
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            return result;
         }
 
         public async Task<RealEstate> Delete(Guid id)
@@ -94,6 +96,8 @@ namespace ShopTARpe25.ApplicationServices.Services
             await _context.Realestates
                 .Where(x => x.Id == id)
                 .ExecuteDeleteAsync();
+
+            await _context.SaveChangesAsync();
 
             return result;
         }

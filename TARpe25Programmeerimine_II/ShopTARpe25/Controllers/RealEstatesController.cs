@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ShopTARpe25.ApplicationServices.Services;
-using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 using ShopTARpe25.Models.RealEstates;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace ShopTARpe25.Controllers
 {
@@ -34,7 +32,6 @@ namespace ShopTARpe25.Controllers
                 .Select(x => new RealEstateIndexViewModel
                 {
                     Id = x.Id,
-                    Address = x.Address,
                     Area = x.Area,
                     BuildingType = x.BuildingType,
                     RoomNumber = x.RoomNumber,
@@ -65,7 +62,15 @@ namespace ShopTARpe25.Controllers
                 Address = model.Address,
                 RoomNumber = model.RoomNumber,
                 BuildingType = model.BuildingType,
-                Files = model.Files
+                Files = model.Files,
+                Image = model.Image
+                    .Select(x => new FileToDatabaseDto
+                    {
+                        Id = x.ImageId,
+                        ImageData = x.ImageData,
+                        ImageTitle = x.ImageTitle,
+                        RealEstateId = x.RealEstateId
+                    }).ToArray()
             };
 
             var result = await _realEstateServices.Create(dto);
@@ -73,7 +78,7 @@ namespace ShopTARpe25.Controllers
             if (result == null)
             {
                 ModelState.AddModelError("", "Real estate creation failed.");
-                return View("CreateUpdate", model);
+                return View(nameof(Index));
             }
 
             return RedirectToAction(nameof(Index));
@@ -82,7 +87,7 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public async Task<IActionResult> Update(Guid id)
         {
-            var result = await _realEstateServices.DetailsAsync(id);
+            var result = await _realEstateServices.DetailAsync(id);
 
             if (result == null)
             {
@@ -106,13 +111,11 @@ namespace ShopTARpe25.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(RealEstateCreateUpdateViewModel vm, Guid? id)
+        public async Task<IActionResult> Update(RealEstateCreateUpdateViewModel vm)
         {
-            vm.Id ??= id;
-
-            if (vm.Id == null)
+            if (!ModelState.IsValid)
             {
-                return NotFound();
+                return View("CreateUpdate", vm);
             }
 
             var dto = new RealEstateDto
@@ -124,24 +127,33 @@ namespace ShopTARpe25.Controllers
                 BuildingType = vm.BuildingType,
                 CreatedAt = vm.CreatedAt,
                 ModifiedAt = vm.ModifiedAt,
-                Files = vm.Files
+                Files = vm.Files,
+                Image = vm.Image
+                    .Select(x => new FileToDatabaseDto
+                    {
+                        Id = x.ImageId,
+                        ImageData = x.ImageData,
+                        ImageTitle = x.ImageTitle,
+                        RealEstateId = x.RealEstateId
+                    }).ToArray()
             };
 
             var result = await _realEstateServices.Update(dto);
 
+            var realEstate = result.Id;
+
             if (result == null)
             {
                 ModelState.AddModelError("", "Real estate update failed.");
-                return View("CreateUpdate", vm);
+                return View(nameof(Index));
             }
-
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Update), new { id = realEstate });
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _realEstateServices.DetailsAsync(id);
+            var result = await _realEstateServices.DetailAsync(id);
 
             if (result == null)
             {
@@ -180,16 +192,16 @@ namespace ShopTARpe25.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            var result = await _realEstateServices.DetailsAsync(id);
+            var result = await _realEstateServices.DetailAsync(id);
 
             if (result == null)
             {
-                return NotFound();
+                ModelState.AddModelError("", "Real estate detail failed.");
+                return View(nameof(Index));
             }
 
             RealEstateImageViewModel[] images = await FileFromDatabase(id);
 
-            //siin toimub info edasi liikumine dto-st viewModelini
             var vm = new RealEstateDetailsViewModel();
 
             vm.Id = result.Id;
@@ -202,25 +214,6 @@ namespace ShopTARpe25.Controllers
             vm.Images.AddRange(images);
 
             return View(vm);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> RemoveImage(RealEstateImageViewModel vm)
-        {
-           var dto = new FileToDatabaseDto()
-           {
-                Id = vm.ImageId
-           };
-
-           var image = await _fileServices.RemoveImageFromDatabase(dto);
-
-           var realEstateId = image.RealEstateId;
-
-            if (image == null)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            return RedirectToAction(nameof(Update), new { id = realEstateId });
         }
 
         private async Task<RealEstateImageViewModel[]> FileFromDatabase(Guid id)
@@ -237,6 +230,26 @@ namespace ShopTARpe25.Controllers
                 }).ToArrayAsync();
 
             return result;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveImage(RealEstateImageViewModel vm)
+        {
+            var dto = new FileToDatabaseDto()
+            {
+                Id = vm.ImageId
+            };
+
+            var image = await _fileServices.RemoveImageFromDatabase(dto);
+
+            var realEstateId = image.RealEstateId;
+
+            if (image == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return RedirectToAction(nameof(Update), new { id = realEstateId });
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using ShopTARpe25.Core.Domain;
 using ShopTARpe25.Core.Dto;
-using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace ShopTARpe25.Core.ServiceInterface
 {
@@ -13,6 +11,6 @@ namespace ShopTARpe25.Core.ServiceInterface
         Task<List<FileToApi>> RemoveImagesFromApi(FileToApiDto[] dto);
         void UploadFilesToDatabase(RealEstateDto dto, RealEstate domain);
         Task<FileToDatabase> RemoveImageFromDatabase(FileToDatabaseDto dto);
-        Task<List<FileToDatabase>> RemoveImagesFromDatabase(FileToDatabaseDto[] dtos);
+        Task<FileToDatabase> RemoveImagesFromDatabase(FileToDatabaseDto[] dto);
     }
 }
