@@ -34,7 +34,6 @@ namespace ShopTARpe25.ApplicationServices.Services
 
                 foreach (var file in dto.Files)
                 {
-
                     string uploadsFolder = Path.Combine(_webHost.ContentRootPath, "wwwroot", "multipleFileUpload");
                     string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -119,6 +118,7 @@ namespace ShopTARpe25.ApplicationServices.Services
                 }
             }
         }
+
         public async Task<FileToDatabase> RemoveImageFromDatabase(FileToDatabaseDto dto)
         {
             var image = await _context.FileToDatabases
@@ -129,22 +129,18 @@ namespace ShopTARpe25.ApplicationServices.Services
 
             return image;
         }
+
         public async Task<FileToDatabase> RemoveImagesFromDatabase(FileToDatabaseDto[] dtos)
         {
             foreach (var dto in dtos)
             {
                 var image = await _context.FileToDatabases
+                    .Where(x => x.Id == dto.Id)
                     .FirstOrDefaultAsync(x => x.Id == dto.Id);
 
-                if (image == null)
-                {
-                    continue;
-                }
-
                 _context.FileToDatabases.Remove(image);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
 
             return null;
         }
