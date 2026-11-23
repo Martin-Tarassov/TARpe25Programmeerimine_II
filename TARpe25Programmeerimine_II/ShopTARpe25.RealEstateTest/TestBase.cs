@@ -2,10 +2,12 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.InMemory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ShopTARpe25.ApplicationServices.Services;
 using ShopTARpe25.Core.ServiceInterface;
 using ShopTARpe25.Data;
 using ShopTARpe25.RealEstateTest.Macros;
+using ShopTARpe25.RealEstateTest.Mock;
 
 namespace ShopTARpe25.RealEstateTest
 {
@@ -29,6 +31,8 @@ namespace ShopTARpe25.RealEstateTest
         {
             // Ühendab IRealEstateServices liidese RealEstateServices klassiga
             services.AddScoped<IRealEstateServices, RealEstateServices>();
+            services.AddScoped<IFileServices, FileServices>();
+            services.AddSingleton<IHostEnvironment, MockIHostEnvironment>();
 
             // Seadistab testandmebaasi
             services.AddDbContext<ShopTARpe25Context>(x =>

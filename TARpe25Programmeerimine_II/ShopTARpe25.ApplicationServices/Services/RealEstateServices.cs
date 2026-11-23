@@ -35,10 +35,10 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.CreatedAt = DateTime.Now;
             domain.ModifiedAt = DateTime.Now;
 
-            if (dto.Files != null)
-            {
-                _fileServices.UploadFilesToDatabase(dto, domain);
-            }
+            //if (dto.Files != null)
+            //{
+            //    _fileServices.UploadFilesToDatabase(dto, domain);
+            //}
 
             await _context.Realestates.AddAsync(domain);
             await _context.SaveChangesAsync();
