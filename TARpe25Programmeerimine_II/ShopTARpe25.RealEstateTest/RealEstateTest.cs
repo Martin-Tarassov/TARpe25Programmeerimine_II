@@ -36,5 +36,46 @@ namespace ShopTARpe25.RealEstateTest
             // Assert
             Assert.NotEqual(dataBaseGuid, wrongGuid);
         }
+        [Fact]
+        public async Task Should_GetByIdRealestate_WhenReturnsEqual()
+        {
+            // Arrange
+
+            Guid databaseGuid = Guid.Parse("5248caec-c78f-4c93-aa95-26be90ff57f0");
+            Guid guid = Guid.Parse("5248caec-c78f-4c93-aa95-26be90ff57f0");
+
+            // Act
+            await Svc<IRealEstateServices>().DetailAsync(guid);
+
+            // Assert
+            Assert.Equal(databaseGuid, guid);
+        }
+        [Fact]
+        public async Task Should_DeleteByIdRealEstate_WhenDeleteRealEstate()
+        {
+            // arrange
+            RealEstateDto dto = MockRealEstateData();
+            // act
+
+            var addRealEstate = await Svc<IRealEstateServices>().Create(dto);
+            var deleteRealEstate = await Svc<IRealEstateServices>().Delete((Guid)addRealEstate.Id);
+
+            // assert
+            Assert.Equal(addRealEstate.Id, deleteRealEstate.Id);
+        }
+        private RealEstateDto MockRealEstateData()
+        {
+            RealEstateDto realEstate = new()
+            {
+                Area = 88.65,
+                Address = "TestAddress",
+                RoomNumber = 1,
+                BuildingType = "TestBuildingType",
+                CreatedAt = DateTime.UtcNow,
+                ModifiedAt = DateTime.UtcNow,
+            };
+
+            return realEstate;
+        }
     }
 }
