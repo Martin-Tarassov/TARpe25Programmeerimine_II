@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ShopTARpe25.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Library : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,6 +27,19 @@ namespace ShopTARpe25.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FileToApis",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ExistingFilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SpaceshipId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileToApis", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Readers",
                 columns: table => new
                 {
@@ -37,6 +50,24 @@ namespace ShopTARpe25.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Readers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Spaceships",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Classification = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BuiltDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Crew = table.Column<int>(type: "int", nullable: true),
+                    EnginePower = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Spaceships", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,7 +112,13 @@ namespace ShopTARpe25.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "FileToApis");
+
+            migrationBuilder.DropTable(
                 name: "Loans");
+
+            migrationBuilder.DropTable(
+                name: "Spaceships");
 
             migrationBuilder.DropTable(
                 name: "Books");
