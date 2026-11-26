@@ -35,10 +35,10 @@ namespace ShopTARpe25.ApplicationServices.Services
             domain.CreatedAt = DateTime.Now;
             domain.ModifiedAt = DateTime.Now;
 
-            //if (dto.Files != null)
-            //{
-            //    _fileServices.UploadFilesToDatabase(dto, domain);
-            //}
+            if (dto.Files != null)
+            {
+                _fileServices.UploadFilesToDatabase(dto, domain);
+            }
 
             await _context.Realestates.AddAsync(domain);
             await _context.SaveChangesAsync();
@@ -92,10 +92,7 @@ namespace ShopTARpe25.ApplicationServices.Services
                 }).ToArrayAsync();
 
             await _fileServices.RemoveImagesFromDatabase(images);
-            await _context.Realestates
-                .Where(x => x.Id == id)
-                .ExecuteDeleteAsync();
-
+            _context.Realestates.Remove(result);
             await _context.SaveChangesAsync();
 
             return result;
