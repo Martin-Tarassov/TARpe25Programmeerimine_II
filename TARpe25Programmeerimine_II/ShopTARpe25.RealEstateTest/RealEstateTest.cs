@@ -93,6 +93,11 @@ namespace ShopTARpe25.RealEstateTest
             Assert.DoesNotMatch(dto.RoomNumber.ToString(), domain.RoomNumber.ToString());
             Assert.DoesNotMatch(dto.Address.ToString(), domain.Address);
         }
+        [Fact]
+        public async Task Should_UpdateRealEstate_WhenUpdatedDataVersion2()
+        {
+
+        }
 
         private RealEstateDto MockRealEstateData()
         {
